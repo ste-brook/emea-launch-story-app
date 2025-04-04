@@ -139,27 +139,20 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
       const data = await response.json();
       
-      // Keep sparkles visible for 0.6 seconds with a gentle fade-out (reduced by 60% from 1.5 seconds)
-      setTimeout(() => {
-        setShowSparkles(false);
-        // Start the transition to make the enhanced story visible
-        setIsEnhancedStoryTransitioning(true);
-        
-        // Update the enhanced story content
-        setStoryState(prev => ({
-          ...prev,
-          enhancedStory: data.enhancedStory
-        }));
-        
-        if (story) {
-          setStory({ ...story, enhancedStory: data.enhancedStory });
-        }
-        
-        // Make the enhanced story fully visible and editable after transition (reduced by 60% from 0.5 seconds)
-        setTimeout(() => {
-          setIsEnhancedStoryEditable(true);
-        }, 200);
-      }, 600);
+      // Immediately update the enhanced story content without any delay
+      setStoryState(prev => ({
+        ...prev,
+        enhancedStory: data.enhancedStory
+      }));
+      
+      if (story) {
+        setStory({ ...story, enhancedStory: data.enhancedStory });
+      }
+      
+      // Hide sparkles immediately
+      setShowSparkles(false);
+      setIsEnhancedStoryEditable(true);
+      
     } catch (error) {
       console.error('Error enhancing story:', error);
       setError(error instanceof Error ? error.message : 'Failed to enhance story. Please try again.');
@@ -180,59 +173,91 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     enhanceStory();
   };
 
-  const submitStory = async () => {
-    if (!validateFields()) {
-      return;
-    }
-
+  const submitStory = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsSubmitting(true);
     setError('');
-    setShowCelebration(true);
-
+    
     try {
+      // First enhance the story
+      const enhancedResponse = await fetch('/api/enhance-story', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          notes: story.notes,
+          merchantName: story.merchantName,
+        }),
+      });
+      
+      if (!enhancedResponse.ok) {
+        throw new Error('Failed to enhance story');
+      }
+      
+      const enhancedData = await enhancedResponse.json();
+      
+      // Update the story with the enhanced version immediately
+      setStory({
+        ...story,
+        enhancedStory: enhancedData.enhancedStory
+      });
+      
+      // Then submit the story with the enhanced version
       const response = await fetch('/api/submit-story', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(storyState),
+        body: JSON.stringify({
+          ...story,
+          enhancedStory: enhancedData.enhancedStory,
+        }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Error submitting story: ${response.statusText}`);
-      }
-
-      const today = new Date().toISOString().split('T')[0];
-      const resetStory = {
-        merchantName: '',
-        submissionDate: today,
-        notes: '',
-        enhancedStory: '',
-        launchConsultant: '',
-        team: '',
-        salesforceCaseLink: '',
-        lineOfBusiness: [],
-        gmv: '',
-        storeType: '',
-        launchDate: '',
-      };
       
-      // Show celebration for exactly 3 seconds before resetting the form
+      if (!response.ok) {
+        throw new Error('Failed to submit story');
+      }
+      
+      // Show celebration message
+      setShowCelebration(true);
+      
+      // Wait for the full 4 seconds before making any other changes
       setTimeout(() => {
-        setStoryState(resetStory);
-        setStory(resetStory);
-        setIsSubmitting(false);
+        // Create empty story object
+        const emptyStory = {
+          merchantName: '',
+          submissionDate: new Date().toISOString().split('T')[0],
+          notes: '',
+          enhancedStory: '',
+          launchConsultant: '',
+          team: '',
+          salesforceCaseLink: '',
+          lineOfBusiness: [],
+          gmv: '',
+          storeType: '',
+          launchDate: '',
+        };
+        
+        // Reset both story and storyState
+        setStory(emptyStory);
+        setStoryState(emptyStory);
+        
+        // Reset additional prompt
+        setAdditionalPrompt('');
+        
+        // Hide the celebration
         setShowCelebration(false);
         
-        // Dispatch a custom event to notify that a story was submitted
-        // This will be used by the LeaderBoard component to refresh its data
-        window.dispatchEvent(new CustomEvent('storySubmitted'));
-      }, 3000);
+        // Finally, after the celebration is hidden, refresh the leaderboard
+        window.dispatchEvent(new Event('storySubmitted'));
+      }, 4000); // Exactly 4 seconds
+      
     } catch (err) {
-      console.error(err);
-      setError('Error submitting story. Please try again.');
+      console.error('Error submitting story:', err);
+      setError('Failed to submit story. Please try again.');
+    } finally {
       setIsSubmitting(false);
-      setShowCelebration(false);
     }
   };
 
@@ -414,7 +439,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
           <button
             type="button"
             onClick={storyState.enhancedStory ? handleUpdateStory : enhanceStory}
-            disabled={isEnhancing || isSubmitting || !storyState.notes || (storyState.enhancedStory && !additionalPrompt)}
+            disabled={isEnhancing || isSubmitting || !storyState.notes || (storyState.enhancedStory && additionalPrompt.length === 0)}
             className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-purple-700 rounded-lg hover:from-indigo-700 hover:via-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             {isEnhancing 

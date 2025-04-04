@@ -40,21 +40,16 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
     fetchLeaderboardData();
   }, []);
 
-  // Set up polling to refresh data every 30 seconds
+  // Listen for the storySubmitted event
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchLeaderboardData();
-    }, 30000); // 30 seconds
-
-    // Listen for the storySubmitted event
     const handleStorySubmitted = () => {
+      console.log('Story submitted event received, refreshing leaderboard');
       fetchLeaderboardData();
     };
     
     window.addEventListener('storySubmitted', handleStorySubmitted);
 
     return () => {
-      clearInterval(intervalId);
       window.removeEventListener('storySubmitted', handleStorySubmitted);
     };
   }, []);
@@ -97,7 +92,7 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
                   {contributor.rank}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-gray-900 dark:text-gray-100 font-medium block truncate text-base">
+                  <span className="text-gray-900 dark:text-gray-100 font-medium block text-base">
                     {contributor.name}
                   </span>
                 </div>
