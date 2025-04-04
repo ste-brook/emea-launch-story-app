@@ -58,12 +58,24 @@ export async function GET() {
     
     // Convert to array and sort by submission count
     const contributors = Object.entries(consultantCounts)
-      .map(([name, submissions], index) => ({
+      .map(([name, submissions]) => ({
         name,
         submissions,
-        rank: index + 1
+        rank: 0 // Initialize rank as 0
       }))
       .sort((a, b) => b.submissions - a.submissions);
+    
+    // Assign ranks based on submission count
+    contributors.forEach((contributor, index) => {
+      if (index === 0) {
+        contributor.rank = 1;
+      } else {
+        const prevContributor = contributors[index - 1];
+        contributor.rank = contributor.submissions === prevContributor.submissions 
+          ? prevContributor.rank 
+          : index + 1;
+      }
+    });
     
     console.log('Leaderboard data:', contributors);
     

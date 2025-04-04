@@ -132,13 +132,13 @@ export function Celebration({ isActive, consultantName }: CelebrationProps) {
       
       {showMessage && (
         <>
-          <div className="overlay fixed inset-0 bg-black/70 z-40"></div>
-          <div className="celebration-message fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-2xl border border-purple-300 dark:border-purple-700 max-w-md text-center z-50">
-            <div className="text-5xl mb-4">🎉</div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          <div className="overlay fixed inset-0 bg-[var(--p-color-bg-overlay)] z-40"></div>
+          <div className="celebration-message fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[var(--p-color-bg-surface)] p-[var(--p-space-8)] rounded-[var(--p-border-radius-base)] shadow-[var(--p-shadow-lg)] border border-[var(--p-color-border-success)] max-w-md text-center z-50">
+            <div className="text-5xl mb-[var(--p-space-4)]">🎉</div>
+            <h3 className="text-2xl font-bold text-[var(--p-color-text)] mb-[var(--p-space-3)]">
               {consultantName ? `Congratulations, ${consultantName}!` : 'Congratulations!'}
             </h3>
-            <p className="text-gray-700 dark:text-gray-300 text-lg">
+            <p className="text-[var(--p-color-text-subdued)] text-lg">
               Your story has been successfully submitted. Thank you for sharing your success with the team!
             </p>
           </div>

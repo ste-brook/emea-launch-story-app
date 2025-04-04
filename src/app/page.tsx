@@ -15,7 +15,7 @@ interface Story {
   salesforceCaseLink: string;
   lineOfBusiness: string[];
   gmv: string;
-  storeType: string;
+  storeType: string[];
   launchDate: string;
 }
 
@@ -30,7 +30,7 @@ export default function Home() {
     salesforceCaseLink: '',
     lineOfBusiness: [],
     gmv: '',
-    storeType: '',
+    storeType: [],
     launchDate: '',
   });
 

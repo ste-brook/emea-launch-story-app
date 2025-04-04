@@ -3,24 +3,227 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Light mode variables (default) */
+  --p-color-bg-surface: #ffffff;
+  --p-color-bg-surface-secondary: #f6f6f7;
+  --p-color-bg-surface-secondary-hover: #e3e3e5;
+  --p-color-bg-overlay: rgba(0, 0, 0, 0.5);
+  --p-color-text: #202223;
+  --p-color-text-subdued: #6d7175;
+  --p-color-text-primary: #202223;
+  --p-color-text-critical: #d82c0d;
+  --p-color-border-subdued: #e1e3e5;
+  --p-color-border-primary: #8c9196;
+  --p-color-bg-success: #50b83c;
+  --p-color-bg-warning: #ffc453;
+  --p-color-bg-primary: #008060;
+  --p-color-text-on-primary: #ffffff;
+  --p-border-radius-base: 0.375rem;
+  --p-border-radius-large: 0.75rem;
+  --p-space-2: 0.5rem;
+  --p-space-4: 1rem;
+  --p-space-6: 1.5rem;
+  --p-space-8: 2rem;
+  --p-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+.dark {
+  /* Dark mode variables */
+  --p-color-bg-surface: #1a1c1e;
+  --p-color-bg-surface-secondary: #2c2e30;
+  --p-color-bg-surface-secondary-hover: #3c3e40;
+  --p-color-bg-overlay: rgba(0, 0, 0, 0.7);
+  --p-color-text: #e3e5e7;
+  --p-color-text-subdued: #999fa4;
+  --p-color-text-primary: #e3e5e7;
+  --p-color-text-critical: #ff4d4d;
+  --p-color-border-subdued: #3c3e40;
+  --p-color-border-primary: #6d7175;
+  --p-color-bg-success: #2e844a;
+  --p-color-bg-warning: #b98900;
+  --p-color-bg-primary: #008060;
+  --p-color-text-on-primary: #ffffff;
+}
+
+@layer base {
+  body {
+    @apply antialiased;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom right,
-    rgb(var(--background-start-rgb)),
-    rgb(var(--background-end-rgb))
-  );
+/* Polaris utility classes */
+.p-card {
+  @apply bg-[var(--p-color-bg-surface)] rounded-[var(--p-border-radius-base)] p-[var(--p-space-4)] shadow-[var(--p-shadow-card)];
+}
+
+.p-text {
+  @apply text-[var(--p-color-text)];
+}
+
+.p-text-subdued {
+  @apply text-[var(--p-color-text-subdued)];
+}
+
+.p-text-primary {
+  @apply text-[var(--p-color-text-primary)];
+}
+
+.p-text-critical {
+  @apply text-[var(--p-color-text-critical)];
+}
+
+.p-input {
+  @apply bg-[var(--p-color-bg-surface-secondary)] border border-[var(--p-color-border-subdued)] rounded-[var(--p-border-radius-base)] py-[var(--p-space-2)] text-[var(--p-color-text)] focus:outline-none focus:ring-2 focus:ring-[var(--p-color-border-focused)] focus:border-[var(--p-color-border-focused)] text-[var(--p-color-text)] px-[var(--p-space-3)];
+  padding-left: 3px;
+  padding-right: 3px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.p-input[type="date"] {
+  @apply px-[var(--p-space-3)];
+  padding-left: 3px;
+  padding-right: 3px;
+  position: relative;
+}
+
+.p-input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 3px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.p-input::placeholder {
+  @apply text-[var(--p-color-text-subdued)];
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+textarea.p-input {
+  @apply px-[var(--p-space-3)];
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+/* Polaris-style checkboxes */
+.p-input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--p-color-border-subdued);
+  border-radius: 3px;
+  background-color: var(--p-color-bg-surface-secondary);
+  cursor: pointer;
+  position: relative;
+  margin-right: 8px;
+  transition: all 0.2s ease;
+}
+
+.p-input[type="checkbox"]:hover {
+  border-color: var(--p-color-border-focused);
+}
+
+.p-input[type="checkbox"]:checked {
+  background-color: var(--p-color-bg-primary);
+  border-color: var(--p-color-border-focused);
+}
+
+.p-input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.p-input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--p-color-bg-primary), 0 0 0 4px var(--p-color-border-focused);
+}
+
+/* Remove dropdown arrow from merchant segment field */
+.p-input[type="text"][name="merchantSegment"] {
+  padding-right: 2px;
+  background-image: none;
+}
+
+/* Style for merchant segment checkboxes */
+.merchant-segment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.merchant-segment-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.merchant-segment-option label {
+  @apply text-[var(--p-color-text)];
+  cursor: pointer;
+}
+
+.p-button {
+  @apply bg-[var(--p-color-bg-primary)] text-[var(--p-color-text-on-primary)] px-[var(--p-space-4)] py-[var(--p-space-2)] rounded-[var(--p-border-radius-base)] hover:opacity-90 transition-opacity;
+}
+
+.p-badge {
+  @apply inline-flex items-center px-[var(--p-space-2)] py-[var(--p-space-1)] rounded-[var(--p-border-radius-base)] text-sm;
+}
+
+.p-badge-critical {
+  @apply bg-[var(--p-color-text-critical)] text-white;
+}
+
+.p-input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--p-color-border-subdued);
+  border-radius: 3px;
+  background-color: var(--p-color-bg-surface-secondary);
+  cursor: pointer;
+  position: relative;
+  margin-right: 8px;
+  transition: all 0.2s ease;
+}
+
+.p-input[type="radio"]:hover {
+  border-color: var(--p-color-border-focused);
+}
+
+.p-input[type="radio"]:checked {
+  background-color: var(--p-color-bg-primary);
+  border-color: var(--p-color-border-focused);
+}
+
+.p-input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.p-input[type="radio"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--p-color-bg-primary), 0 0 0 4px var(--p-color-border-focused);
 }
