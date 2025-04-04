@@ -1,57 +1,61 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { AI_RULES } from '@/config/ai-rules';
 
+// Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.OPENAI_BASE_URL,
 });
 
 export async function POST(request: Request) {
   try {
-    const { merchantName, notes } = await request.json();
+    const { merchantName, notes, additionalPrompt } = await request.json();
 
-    if (!notes) {
+    if (!merchantName || !notes) {
       return NextResponse.json(
-        { error: 'Notes are required' },
+        { error: 'Merchant name and notes are required' },
         { status: 400 }
       );
     }
 
-    const prompt = `As a Shopify Launch Consultant, please enhance the following story about helping a merchant launch their store. Make it engaging, professional, and highlight the key challenges and solutions. Include specific details and outcomes where possible.
-
-Merchant Name: ${merchantName}
-Original Notes: ${notes}
-
-Please format the enhanced story in a clear, narrative structure that emphasizes:
-1. The initial challenge or situation
-2. The actions taken to address it
-3. The specific solutions implemented
-4. The positive outcomes achieved
-
-Make the story engaging while maintaining professionalism.`;
+    console.log('Sending request to OpenAI to enhance story...');
+    console.log('Original notes:', notes);
+    if (additionalPrompt) {
+      console.log('Additional instructions:', additionalPrompt);
+    }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
+      ...AI_RULES.modelConfig,
       messages: [
         {
-          role: "system",
-          content: "You are an expert Shopify Launch Consultant who helps craft engaging success stories about helping merchants launch their stores."
+          role: "system" as const,
+          content: AI_RULES.systemMessage
         },
         {
-          role: "user",
-          content: prompt
-        }
+          role: "user" as const,
+          content: AI_RULES.promptTemplate(merchantName, notes)
+        },
+        ...(additionalPrompt ? [{
+          role: "user" as const,
+          content: `Please update the story based on these additional instructions: ${additionalPrompt}`
+        }] : [])
       ],
-      temperature: 0.7,
-      max_tokens: 1000,
     });
 
-    const enhancedStory = completion.choices[0].message.content;
+    const enhancedStory = completion.choices[0]?.message?.content;
+
+    if (!enhancedStory) {
+      throw new Error('No response from OpenAI');
+    }
+
+    console.log('Enhanced story:', enhancedStory);
 
     return NextResponse.json({ enhancedStory });
   } catch (error) {
     console.error('Error enhancing story:', error);
     return NextResponse.json(
-      { error: 'Failed to enhance story' },
+      { error: 'Error enhancing story' },
       { status: 500 }
     );
   }

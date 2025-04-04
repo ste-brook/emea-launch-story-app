@@ -39,6 +39,11 @@ export default function Home() {
           </div>
           <div className="lg:col-span-8">
             <StoryForm story={story} setStory={setStory} />
+            {story.enhancedStory && (
+              <div className="mt-6">
+                <StoryPreview story={story.enhancedStory} />
+              </div>
+            )}
           </div>
         </div>
       </div>
