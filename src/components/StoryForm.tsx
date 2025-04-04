@@ -217,15 +217,13 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
         launchDate: '',
       };
       
-      setStoryState(resetStory);
-      setStory(resetStory);
-
+      // Show celebration for exactly 3 seconds before resetting the form
       setTimeout(() => {
+        setStoryState(resetStory);
+        setStory(resetStory);
         setIsSubmitting(false);
-        setTimeout(() => {
-          setShowCelebration(false);
-        }, 4000);
-      }, 1000);
+        setShowCelebration(false);
+      }, 3000);
     } catch (err) {
       console.error(err);
       setError('Error submitting story. Please try again.');
@@ -422,6 +420,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
           <button
             type="submit"
+            onClick={submitStory}
             disabled={isSubmitting}
             className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-600 to-green-700 rounded-lg hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >

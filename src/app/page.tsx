@@ -15,6 +15,8 @@ interface Story {
   salesforceCaseLink: string;
   lineOfBusiness: string[];
   gmv: string;
+  storeType: string;
+  launchDate: string;
 }
 
 export default function Home() {
@@ -28,6 +30,8 @@ export default function Home() {
     salesforceCaseLink: '',
     lineOfBusiness: [],
     gmv: '',
+    storeType: '',
+    launchDate: '',
   });
 
   return (
