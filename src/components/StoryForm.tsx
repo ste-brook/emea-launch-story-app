@@ -252,7 +252,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 placeholder="Enter your name"
               />
               {fieldErrors.launchConsultant && (
-                <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.launchConsultant}</p>
+                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.launchConsultant}</p>
               )}
             </div>
 
@@ -269,7 +269,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 placeholder="Enter merchant name"
               />
               {fieldErrors.merchantName && (
-                <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.merchantName}</p>
+                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.merchantName}</p>
               )}
             </div>
           </div>
@@ -288,7 +288,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 placeholder="Enter Salesforce case link"
               />
               {fieldErrors.salesforceCaseLink && (
-                <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.salesforceCaseLink}</p>
+                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.salesforceCaseLink}</p>
               )}
             </div>
 
@@ -304,7 +304,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 className="p-input w-full py-1"
               />
               {fieldErrors.submissionDate && (
-                <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.submissionDate}</p>
+                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.submissionDate}</p>
               )}
             </div>
           </div>
@@ -329,7 +329,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 ))}
               </div>
               {fieldErrors.storeType && (
-                <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.storeType}</p>
+                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.storeType}</p>
               )}
             </div>
 
@@ -351,7 +351,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 ))}
               </div>
               {fieldErrors.lineOfBusiness && (
-                <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.lineOfBusiness}</p>
+                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.lineOfBusiness}</p>
               )}
             </div>
           </div>
@@ -369,7 +369,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               placeholder="Enter GMV per LoB (e.g. D2C 20M, B2B 8M)"
             />
             {fieldErrors.gmv && (
-              <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.gmv}</p>
+              <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.gmv}</p>
             )}
           </div>
 
@@ -386,7 +386,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               placeholder="Enter your story notes"
             />
             {fieldErrors.notes && (
-              <p className="p-text p-text-subdued mt-1 text-xs">{fieldErrors.notes}</p>
+              <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.notes}</p>
             )}
           </div>
 
