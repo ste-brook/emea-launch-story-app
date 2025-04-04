@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface Confetti {
-  id: number;
+  id: string;
   color: string;
   style: React.CSSProperties;
 }
@@ -42,6 +42,7 @@ export function Celebration({ isActive, consultantName }: CelebrationProps) {
   const [confetti, setConfetti] = useState<Confetti[]>([]);
   const [showMessage, setShowMessage] = useState(false);
   const colors = ['#FFD700', '#FF69B4', '#87CEEB', '#98FB98', '#DDA0DD', '#F0E68C'];
+  const counterRef = useRef(0);
 
   useEffect(() => {
     if (isActive) {
@@ -50,8 +51,9 @@ export function Celebration({ isActive, consultantName }: CelebrationProps) {
         // Create multiple confetti particles at once for a denser effect
         const newConfettiParticles = Array.from({ length: 5 }, () => {
           const size = Math.random() * 10 + 5; // Random size between 5-15px
+          counterRef.current += 1;
           return {
-            id: Date.now() + Math.random(),
+            id: `confetti-${Date.now()}-${counterRef.current}`,
             style: {
               left: `${Math.random() * 100}vw`,
               top: `${Math.random() * 100}vh`,
