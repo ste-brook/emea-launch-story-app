@@ -39,19 +39,26 @@ export async function GET() {
     });
 
     if (!response.data.values || response.data.values.length <= 1) {
-      // Only headers or no data
+      console.log('No data found in the sheet');
       return NextResponse.json({ contributors: [] });
     }
 
-    // Skip the header row
-    const rows = response.data.values.slice(1);
+    // Get the headers and clean them
+    const headers = response.data.values[0].map(header => header.toString().trim());
+    console.log('Headers found:', headers);
+
+    // Skip the header row and clean up the data
+    const rows = response.data.values.slice(1).map(row => 
+      row.map(cell => cell ? cell.toString().trim() : '')
+    );
     
     // Count submissions by launch consultant
     const consultantCounts: Record<string, number> = {};
     
     rows.forEach(row => {
-      if (row[0]) { // Column A contains the launch consultant name
-        const consultantName = row[0].trim();
+      // The first column (index 0) contains the launch consultant name
+      const consultantName = row[0];
+      if (consultantName && consultantName !== 'Launch Consultant') {
         consultantCounts[consultantName] = (consultantCounts[consultantName] || 0) + 1;
       }
     });

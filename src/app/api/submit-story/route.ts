@@ -15,15 +15,13 @@ const sheets = google.sheets({ version: 'v4', auth });
 
 // Headers for the Google Sheet
 const HEADERS = [
-  'Submission Date',
-  'Merchant Name',
   'Launch Consultant',
+  'Merchant Name',
   'Merchant Segment',
   'GMV',
   'Line of Business',
-  'Story Notes',
-  'Enhanced Story',
-  'Submission Timestamp'
+  'Story',
+  'Submission Date'
 ];
 
 export async function POST(request: Request) {
@@ -67,7 +65,7 @@ export async function POST(request: Request) {
       console.log('Checking if headers exist in the sheet');
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: `${sheetName}!A1:I1`,
+        range: `${sheetName}!A1:G1`,
       });
 
       if (!response.data.values || response.data.values.length === 0) {
@@ -75,7 +73,7 @@ export async function POST(request: Request) {
         // Headers don't exist, create them
         await sheets.spreadsheets.values.update({
           spreadsheetId: process.env.GOOGLE_SHEET_ID,
-          range: `${sheetName}!A1:I1`,
+          range: `${sheetName}!A1:G1`,
           valueInputOption: 'USER_ENTERED',
           requestBody: {
             values: [HEADERS],
@@ -96,22 +94,15 @@ export async function POST(request: Request) {
       : story.lineOfBusiness || '';
 
     // Prepare the data for Google Sheets with the correct column order
-    // Column A: Launch Consultant
-    // Column B: Merchant Name
-    // Column C: Merchant Segment
-    // Column D: GMV
-    // Column E: Line of Business
-    // Column F: Enhanced Story
-    // Column G: Submission Date
     const values = [
       [
-        story.launchConsultant || '', // Column A: Launch Consultant
-        story.merchantName || '', // Column B: Merchant Name
-        story.storeType || '', // Column C: Merchant Segment
-        story.gmv || '', // Column D: GMV
-        lineOfBusinessString, // Column E: Line of Business
-        story.enhancedStory || '', // Column F: Enhanced Story (not the original notes)
-        story.submissionDate || new Date().toISOString().split('T')[0], // Column G: Submission Date
+        (story.launchConsultant || '').trim(), // Column A: Launch Consultant
+        (story.merchantName || '').trim(), // Column B: Merchant Name
+        (story.storeType || '').trim(), // Column C: Merchant Segment
+        (story.gmv || '').trim(), // Column D: GMV
+        lineOfBusinessString.trim(), // Column E: Line of Business
+        (story.enhancedStory || '').trim(), // Column F: Story
+        (story.submissionDate || new Date().toISOString().split('T')[0]).trim(), // Column G: Submission Date
       ],
     ];
 
