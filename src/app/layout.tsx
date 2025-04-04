@@ -28,7 +28,7 @@ export default function RootLayout({
                   alt="Shopify Logo"
                   width={32}
                   height={32}
-                  className="mr-4"
+                  className="mr-4 dark:invert"
                 />
                 <h1 className="text-xl font-bold text-[var(--p-color-text-primary)]">
                   EMEA Launch Story Submissions

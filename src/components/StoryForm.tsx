@@ -390,57 +390,69 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
             )}
           </div>
 
-          {story.enhancedStory && (
-            <div>
-              <label htmlFor="additionalPrompt" className="block p-text font-medium mb-1 text-sm">
-                Additional Instructions
-              </label>
-              <textarea
-                id="additionalPrompt"
-                value={additionalPrompt}
-                onChange={(e) => setAdditionalPrompt(e.target.value)}
-                className="p-input w-full"
-                rows={1}
-                placeholder="Add instructions to improve the story..."
-              />
-            </div>
-          )}
-
           {error && (
             <div className="p-badge p-badge-critical text-xs">
               {error}
             </div>
           )}
 
-          <div className="flex justify-between items-center pt-2">
-            <SparklyButton
-              onClick={story.enhancedStory ? handleUpdateStory : enhanceStory}
-              disabled={isEnhancing || isUpdating}
-              className="p-button py-1 text-sm"
-            >
-              {isEnhancing || isUpdating ? 'Processing...' : story.enhancedStory ? 'Update Story' : 'Enhance Story'}
-            </SparklyButton>
-            
-            <button
-              type="submit"
-              className="p-button p-button-primary py-1 text-sm"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit Story'}
-            </button>
-          </div>
+          {!story.enhancedStory && (
+            <div className="flex justify-start pt-2">
+              <SparklyButton
+                onClick={enhanceStory}
+                disabled={isEnhancing}
+                className="p-button py-1 text-sm"
+              >
+                {isEnhancing ? 'Processing...' : 'Enhance Story'}
+              </SparklyButton>
+            </div>
+          )}
         </form>
 
         <div className="p-card bg-[var(--p-color-bg-surface)] rounded-[var(--p-border-radius-base)] shadow-[var(--p-shadow-card)] border border-[var(--p-color-border-subdued)]">
           <div className="p-[var(--p-space-3)]">
             <h3 className="p-text font-medium mb-2 text-sm">Enhanced Story</h3>
             {story.enhancedStory ? (
-              <textarea
-                value={story.enhancedStory}
-                onChange={(e) => setStory({ ...story, enhancedStory: e.target.value })}
-                className="p-input w-full min-h-[300px] bg-[var(--p-color-bg-surface-secondary)] text-sm"
-                placeholder="Enhanced story will appear here..."
-              />
+              <>
+                <textarea
+                  value={story.enhancedStory}
+                  onChange={(e) => setStory({ ...story, enhancedStory: e.target.value })}
+                  className="p-input w-full min-h-[300px] bg-[var(--p-color-bg-surface-secondary)] text-sm"
+                  placeholder="Enhanced story will appear here..."
+                />
+                
+                <div className="mt-4">
+                  <label htmlFor="additionalPrompt" className="block p-text font-medium mb-1 text-sm">
+                    Additional Instructions
+                  </label>
+                  <textarea
+                    id="additionalPrompt"
+                    value={additionalPrompt}
+                    onChange={(e) => setAdditionalPrompt(e.target.value)}
+                    className="p-input w-full"
+                    rows={1}
+                    placeholder="Add instructions to improve the story..."
+                  />
+                  <div className="flex justify-between items-center mt-4">
+                    <SparklyButton
+                      onClick={handleUpdateStory}
+                      disabled={isEnhancing || isUpdating}
+                      className="p-button py-1 text-sm"
+                    >
+                      {isEnhancing || isUpdating ? 'Processing...' : 'Update Story'}
+                    </SparklyButton>
+                    
+                    <button
+                      type="submit"
+                      onClick={submitStory}
+                      className="p-button p-button-primary py-1 text-sm"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Submitting...' : 'Submit Story'}
+                    </button>
+                  </div>
+                </div>
+              </>
             ) : (
               <div className="min-h-[300px] bg-[var(--p-color-bg-surface-secondary)] rounded-[var(--p-border-radius-base)] p-[var(--p-space-3)] flex flex-col items-center justify-center text-center">
                 <div className="text-[var(--p-color-text-subdued)] mb-[var(--p-space-3)]">
