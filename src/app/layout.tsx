@@ -7,7 +7,7 @@ import Image from 'next/image'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Launch Story App",
+  title: "EMEA Launch Story Submissions",
   description: "Share your launch stories and celebrate success",
 };
 
@@ -23,8 +23,15 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
+                <Image
+                  src="/images/black-shopify-ecommerce-logo-701751694791307pvl6xyyal3-removebg-preview.png"
+                  alt="Shopify Logo"
+                  width={32}
+                  height={32}
+                  className="mr-4"
+                />
                 <h1 className="text-xl font-bold text-[var(--p-color-text-primary)]">
-                  Launch Story App
+                  EMEA Launch Story Submissions
                 </h1>
               </div>
               <div className="flex items-center">

@@ -55,35 +55,35 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
   }, []);
 
   return (
-    <div className="p-card bg-[var(--p-color-bg-surface)]/95 backdrop-blur-lg rounded-[var(--p-border-radius-large)] p-[var(--p-space-8)] h-full flex flex-col">
-      <h2 className="text-xl font-bold text-[var(--p-color-text-primary)] mb-[var(--p-space-6)]">
+    <div className="p-card bg-[var(--p-color-bg-surface)]/95 backdrop-blur-lg rounded-[var(--p-border-radius-large)] p-[var(--p-space-4)] h-full flex flex-col">
+      <h2 className="text-lg font-bold text-[var(--p-color-text-primary)] mb-[var(--p-space-4)]">
         Top Contributors
       </h2>
       
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[var(--p-color-border-primary)]"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-[var(--p-color-border-primary)]"></div>
         </div>
       ) : error ? (
-        <div className="flex-1 flex items-center justify-center text-[var(--p-color-text-critical)]">
+        <div className="flex-1 flex items-center justify-center text-[var(--p-color-text-critical)] text-sm">
           {error}
         </div>
       ) : contributors.length === 0 ? (
-        <div className="flex-1 flex items-center justify-center text-[var(--p-color-text-subdued)]">
+        <div className="flex-1 flex items-center justify-center text-[var(--p-color-text-subdued)] text-sm">
           No submissions yet
         </div>
       ) : (
-        <div className="flex-1 space-y-[var(--p-space-4)]">
+        <div className="flex-1 space-y-[var(--p-space-2)]">
           {contributors.map((contributor) => (
             <div
               key={`${contributor.name}-${contributor.rank}`}
-              className={`flex items-center justify-between p-[var(--p-space-4)] rounded-[var(--p-border-radius-base)] bg-[var(--p-color-bg-surface-secondary)] border border-[var(--p-color-border-subdued)] transition-all duration-200 hover:border-[var(--p-color-border-primary)] ${
+              className={`flex items-center justify-between p-[var(--p-space-2)] rounded-[var(--p-border-radius-base)] bg-[var(--p-color-bg-surface-secondary)] border border-[var(--p-color-border-subdued)] transition-all duration-200 hover:border-[var(--p-color-border-primary)] ${
                 currentConsultant === contributor.name ? 'border-[var(--p-color-border-primary)]' : ''
               }`}
             >
-              <div className="flex items-center space-x-[var(--p-space-4)] flex-1 min-w-0">
+              <div className="flex items-center space-x-[var(--p-space-2)] flex-1 min-w-0">
                 <div className={`
-                  w-8 h-8 flex-shrink-0 rounded-full flex items-center justify-center text-[var(--p-color-text-on-primary)] font-semibold
+                  w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center text-[var(--p-color-text-on-primary)] text-sm font-semibold
                   ${contributor.rank === 1 ? 'bg-[#FFD700]' :
                     contributor.rank === 2 ? 'bg-[#C0C0C0]' :
                     contributor.rank === 3 ? 'bg-[#CD7F32]' :
@@ -99,16 +99,16 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
                   {contributor.rank}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-[var(--p-color-text)] font-medium block text-base">
+                  <span className="text-[var(--p-color-text)] font-medium block text-sm">
                     {contributor.name}
                   </span>
                 </div>
               </div>
-              <div className="flex items-center space-x-[var(--p-space-2)] flex-shrink-0 ml-[var(--p-space-6)]">
-                <span className="text-[var(--p-color-text)] font-medium text-base">
+              <div className="flex items-center space-x-[var(--p-space-1)] flex-shrink-0 ml-[var(--p-space-4)]">
+                <span className="text-[var(--p-color-text)] font-medium text-sm">
                   {contributor.submissions}
                 </span>
-                <span className="text-sm text-[var(--p-color-text-subdued)] whitespace-nowrap">
+                <span className="text-xs text-[var(--p-color-text-subdued)] whitespace-nowrap">
                   stories
                 </span>
               </div>
@@ -117,7 +117,7 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
         </div>
       )}
       
-      <div className="mt-[var(--p-space-8)] text-center text-sm text-[var(--p-color-text-subdued)]">
+      <div className="mt-[var(--p-space-4)] text-center text-xs text-[var(--p-color-text-subdued)]">
         Share your story and join the leaderboard!
       </div>
     </div>
