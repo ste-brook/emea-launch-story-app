@@ -104,7 +104,7 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center space-x-[var(--p-space-1)] flex-shrink-0 ml-[var(--p-space-4)]">
+              <div className="flex items-center space-x-[var(--p-space-2)] flex-shrink-0 ml-[var(--p-space-4)]">
                 <span className="text-[var(--p-color-text)] font-medium text-sm">
                   {contributor.submissions}
                 </span>
