@@ -20,7 +20,8 @@ interface StoryFormProps {
 }
 
 export function StoryForm({ story, setStory }: StoryFormProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isEnhancing, setIsEnhancing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const [storyState, setStoryState] = useState<Story>({
@@ -61,7 +62,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       return;
     }
 
-    setIsLoading(true);
+    setIsEnhancing(true);
     setError('');
 
     try {
@@ -81,21 +82,21 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       }
 
       const data = await response.json();
-      setStory({ ...storyState, enhancedStory: data.enhancedStory });
+      setStoryState(prev => ({ ...prev, enhancedStory: data.enhancedStory }));
     } catch (err) {
       setError('Failed to enhance story. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsEnhancing(false);
     }
   };
 
   const submitStory = async () => {
-    if (!storyState.enhancedStory) {
-      setError('Please enhance your story before submitting.');
+    if (!storyState.merchantName) {
+      setError('Please enter a merchant name.');
       return;
     }
 
-    setIsLoading(true);
+    setIsSubmitting(true);
     setError('');
 
     try {
@@ -126,7 +127,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     } catch (err) {
       setError('Failed to submit story. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -262,10 +263,10 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
         <button
           type="button"
           onClick={enhanceStory}
-          disabled={isLoading || !storyState.notes}
+          disabled={isEnhancing || isSubmitting || !storyState.notes}
           className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-purple-700 rounded-lg hover:from-indigo-700 hover:via-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
-          {isLoading ? (
+          {isEnhancing ? (
             <>
               <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -281,10 +282,10 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
         <button
           type="button"
           onClick={submitStory}
-          disabled={isLoading || !storyState.enhancedStory}
+          disabled={isEnhancing || isSubmitting}
           className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-emerald-500 to-green-600 rounded-lg hover:from-emerald-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
         >
-          {isLoading ? (
+          {isSubmitting ? (
             <>
               <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

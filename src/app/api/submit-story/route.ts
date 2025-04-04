@@ -17,9 +17,9 @@ export async function POST(request: Request) {
   try {
     const story = await request.json();
 
-    if (!story.merchantName || !story.enhancedStory) {
+    if (!story.merchantName) {
       return NextResponse.json(
-        { error: 'Merchant name and enhanced story are required' },
+        { error: 'Merchant name is required' },
         { status: 400 }
       );
     }
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       [
         story.submissionDate,
         story.merchantName,
-        story.enhancedStory,
+        story.enhancedStory || story.notes, // Use notes if no enhanced story
         new Date().toISOString(), // Timestamp of submission
       ],
     ];
