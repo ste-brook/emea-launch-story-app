@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { StoryForm } from '@/components/StoryForm';
-import { StoryPreview } from '@/components/StoryPreview';
 import { LeaderBoard } from '@/components/LeaderBoard';
 
 interface Story {
@@ -15,7 +14,7 @@ interface Story {
   salesforceCaseLink: string;
   lineOfBusiness: string[];
   gmv: string;
-  storeType: string[];
+  storeType: string;
   launchDate: string;
 }
 
@@ -30,7 +29,7 @@ export default function Home() {
     salesforceCaseLink: '',
     lineOfBusiness: [],
     gmv: '',
-    storeType: [],
+    storeType: '',
     launchDate: '',
   });
 
@@ -43,11 +42,6 @@ export default function Home() {
           </div>
           <div className="lg:col-span-8">
             <StoryForm story={story} setStory={setStory} />
-            {story.enhancedStory && (
-              <div className="mt-6">
-                <StoryPreview story={story.enhancedStory} />
-              </div>
-            )}
           </div>
         </div>
       </div>

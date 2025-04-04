@@ -26,10 +26,10 @@ interface StoryFormProps {
 export function StoryForm({ story, setStory }: StoryFormProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [showSparkles, setShowSparkles] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [additionalPrompt, setAdditionalPrompt] = useState<string>('');
+  const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isEnhancedStoryVisible, setIsEnhancedStoryVisible] = useState(false);
@@ -121,7 +121,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       
       setStory({
         ...story,
-        enhancedStory: data.enhancedStory
+        enhancedStory: data.enhancedStory as string
       });
       
       setShowSparkles(false);
@@ -136,10 +136,41 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     }
   };
 
-  const handleUpdateStory = () => {
-    if (!story.enhancedStory) return;
+  const handleUpdateStory = async () => {
+    if (!validateFields()) return;
+    
     setIsUpdating(true);
-    enhanceStory();
+    setShowSparkles(true);
+    
+    try {
+      const response = await fetch('/api/enhance-story', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...story,
+          additionalPrompt,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update story');
+      }
+
+      const data = await response.json();
+      setStory({
+        ...story,
+        enhancedStory: data.enhancedStory as string,
+      });
+      setAdditionalPrompt('');
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred while updating the story');
+    } finally {
+      setIsUpdating(false);
+      setShowSparkles(false);
+    }
   };
 
   const submitStory = async (e: React.FormEvent) => {
@@ -197,170 +228,195 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   };
 
   return (
-    <div className="p-card max-w-2xl mx-auto">
+    <div className="p-card">
       <Sparkles isActive={showSparkles} />
       <Celebration isActive={showCelebration} consultantName={story.launchConsultant} />
-      <form onSubmit={submitStory} className="space-y-6">
-        <div>
-          <label htmlFor="launchConsultant" className="block p-text font-medium mb-2">
-            Launch Consultant
-          </label>
-          <input
-            type="text"
-            id="launchConsultant"
-            value={story.launchConsultant}
-            onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
-            className="p-input w-full"
-            placeholder="Enter your name"
-          />
-          {fieldErrors.launchConsultant && (
-            <p className="p-text p-text-subdued mt-1">{fieldErrors.launchConsultant}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="merchantName" className="block p-text font-medium mb-2">
-            Merchant Name
-          </label>
-          <input
-            type="text"
-            id="merchantName"
-            value={story.merchantName}
-            onChange={(e) => setStory({ ...story, merchantName: e.target.value })}
-            className="p-input w-full"
-            placeholder="Enter merchant name"
-          />
-          {fieldErrors.merchantName && (
-            <p className="p-text p-text-subdued mt-1">{fieldErrors.merchantName}</p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="submissionDate" className="block p-text font-medium mb-2">
-            Submission Date
-          </label>
-          <input
-            type="date"
-            id="submissionDate"
-            value={story.submissionDate}
-            onChange={(e) => setStory({ ...story, submissionDate: e.target.value })}
-            className="p-input w-full"
-          />
-          {fieldErrors.submissionDate && (
-            <p className="p-text p-text-subdued mt-1">{fieldErrors.submissionDate}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block p-text font-medium mb-2">
-            Merchant Segment
-          </label>
-          <div className="flex flex-wrap gap-4">
-            {['Mid-Market', 'Large', 'Enterprise'].map((segment) => (
-              <label key={segment} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="merchantSegment"
-                  checked={story.storeType === segment}
-                  onChange={() => handleMerchantSegmentChange(segment)}
-                  className="p-input"
-                />
-                <span className="p-text">{segment}</span>
-              </label>
-            ))}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <form onSubmit={submitStory} className="space-y-6">
+          <div>
+            <label htmlFor="launchConsultant" className="block p-text font-medium mb-2">
+              Launch Consultant
+            </label>
+            <input
+              type="text"
+              id="launchConsultant"
+              value={story.launchConsultant}
+              onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
+              className="p-input w-full"
+              placeholder="Enter your name"
+            />
+            {fieldErrors.launchConsultant && (
+              <p className="p-text p-text-subdued mt-1">{fieldErrors.launchConsultant}</p>
+            )}
           </div>
-          {fieldErrors.storeType && (
-            <p className="p-text p-text-subdued mt-1">{fieldErrors.storeType}</p>
-          )}
-        </div>
 
-        <div>
-          <label className="block p-text font-medium mb-2">
-            Line of Business
-          </label>
-          <div className="flex flex-wrap gap-4">
-            {['D2C', 'B2B', 'POS Pro'].map((business) => (
-              <label key={business} className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={story.lineOfBusiness?.includes(business) || false}
-                  onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
-                  className="p-input"
-                />
-                <span className="p-text">{business}</span>
-              </label>
-            ))}
+          <div>
+            <label htmlFor="merchantName" className="block p-text font-medium mb-2">
+              Merchant Name
+            </label>
+            <input
+              type="text"
+              id="merchantName"
+              value={story.merchantName}
+              onChange={(e) => setStory({ ...story, merchantName: e.target.value })}
+              className="p-input w-full"
+              placeholder="Enter merchant name"
+            />
+            {fieldErrors.merchantName && (
+              <p className="p-text p-text-subdued mt-1">{fieldErrors.merchantName}</p>
+            )}
           </div>
-          {fieldErrors.lineOfBusiness && (
-            <p className="p-text p-text-subdued mt-1">{fieldErrors.lineOfBusiness}</p>
-          )}
-        </div>
 
-        <div>
-          <label htmlFor="gmv" className="block p-text font-medium mb-2">
-            GMV
-          </label>
-          <input
-            type="text"
-            id="gmv"
-            value={story.gmv}
-            onChange={(e) => setStory({ ...story, gmv: e.target.value })}
-            className="p-input w-full"
-            placeholder="Enter GMV"
-          />
-          {fieldErrors.gmv && (
-            <p className="p-text p-text-subdued mt-1">{fieldErrors.gmv}</p>
-          )}
-        </div>
+          <div>
+            <label htmlFor="submissionDate" className="block p-text font-medium mb-2">
+              Submission Date
+            </label>
+            <input
+              type="date"
+              id="submissionDate"
+              value={story.submissionDate}
+              onChange={(e) => setStory({ ...story, submissionDate: e.target.value })}
+              className="p-input w-full"
+            />
+            {fieldErrors.submissionDate && (
+              <p className="p-text p-text-subdued mt-1">{fieldErrors.submissionDate}</p>
+            )}
+          </div>
 
-        <div>
-          <label htmlFor="notes" className="block p-text font-medium mb-2">
-            Story Notes
-          </label>
-          <textarea
-            id="notes"
-            value={story.notes}
-            onChange={(e) => setStory({ ...story, notes: e.target.value })}
-            className="p-input w-full"
-            rows={4}
-            placeholder="Enter your story notes"
-          />
-          {fieldErrors.notes && (
-            <p className="p-text p-text-subdued mt-1">{fieldErrors.notes}</p>
-          )}
-        </div>
+          <div>
+            <label className="block p-text font-medium mb-2">
+              Merchant Segment
+            </label>
+            <div className="flex flex-wrap gap-4">
+              {['Mid-Market', 'Large', 'Enterprise'].map((segment) => (
+                <label key={segment} className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="merchantSegment"
+                    checked={story.storeType === segment}
+                    onChange={() => handleMerchantSegmentChange(segment)}
+                    className="p-input"
+                  />
+                  <span className="p-text">{segment}</span>
+                </label>
+              ))}
+            </div>
+            {fieldErrors.storeType && (
+              <p className="p-text p-text-subdued mt-1">{fieldErrors.storeType}</p>
+            )}
+          </div>
 
-        {error && (
-          <div className="p-badge p-badge-critical">
-            {error}
+          <div>
+            <label className="block p-text font-medium mb-2">
+              Line of Business
+            </label>
+            <div className="flex flex-wrap gap-4">
+              {['D2C', 'B2B', 'POS Pro'].map((business) => (
+                <label key={business} className="flex items-center space-x-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={story.lineOfBusiness?.includes(business) || false}
+                    onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
+                    className="p-input"
+                  />
+                  <span className="p-text">{business}</span>
+                </label>
+              ))}
+            </div>
+            {fieldErrors.lineOfBusiness && (
+              <p className="p-text p-text-subdued mt-1">{fieldErrors.lineOfBusiness}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="gmv" className="block p-text font-medium mb-2">
+              GMV
+            </label>
+            <input
+              type="text"
+              id="gmv"
+              value={story.gmv}
+              onChange={(e) => setStory({ ...story, gmv: e.target.value })}
+              className="p-input w-full"
+              placeholder="Enter GMV"
+            />
+            {fieldErrors.gmv && (
+              <p className="p-text p-text-subdued mt-1">{fieldErrors.gmv}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="notes" className="block p-text font-medium mb-2">
+              Story Notes
+            </label>
+            <textarea
+              id="notes"
+              value={story.notes}
+              onChange={(e) => setStory({ ...story, notes: e.target.value })}
+              className="p-input w-full"
+              rows={4}
+              placeholder="Enter your story notes"
+            />
+            {fieldErrors.notes && (
+              <p className="p-text p-text-subdued mt-1">{fieldErrors.notes}</p>
+            )}
+          </div>
+
+          {story.enhancedStory && (
+            <div>
+              <label htmlFor="additionalPrompt" className="block p-text font-medium mb-2">
+                Additional Instructions
+              </label>
+              <textarea
+                id="additionalPrompt"
+                value={additionalPrompt}
+                onChange={(e) => setAdditionalPrompt(e.target.value)}
+                className="p-input w-full"
+                rows={2}
+                placeholder="Add instructions to improve the story..."
+              />
+            </div>
+          )}
+
+          {error && (
+            <div className="p-badge p-badge-critical">
+              {error}
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={story.enhancedStory ? handleUpdateStory : enhanceStory}
+              className="p-button"
+              disabled={isEnhancing || isUpdating}
+            >
+              {isEnhancing || isUpdating ? 'Processing...' : story.enhancedStory ? 'Update Story' : 'Enhance Story'}
+            </button>
+            <button
+              type="submit"
+              className="p-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Story'}
+            </button>
+          </div>
+        </form>
+
+        {story.enhancedStory && (
+          <div className="p-card bg-[var(--p-color-bg-surface)] rounded-[var(--p-border-radius-base)] shadow-[var(--p-shadow-card)] border border-[var(--p-color-border-subdued)]">
+            <div className="p-[var(--p-space-4)]">
+              <h3 className="p-text font-medium mb-4">Enhanced Story</h3>
+              <textarea
+                value={story.enhancedStory}
+                onChange={(e) => setStory({ ...story, enhancedStory: e.target.value })}
+                className="p-input w-full min-h-[400px] bg-[var(--p-color-bg-surface-secondary)]"
+                placeholder="Enhanced story will appear here..."
+              />
+            </div>
           </div>
         )}
-
-        <div className="flex justify-end space-x-4">
-          <button
-            type="button"
-            onClick={enhanceStory}
-            className="p-button"
-            disabled={isEnhancing}
-          >
-            {isEnhancing ? 'Enhancing...' : 'Enhance Story'}
-          </button>
-          <button
-            type="submit"
-            className="p-button"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Submitting...' : 'Submit Story'}
-          </button>
-        </div>
-      </form>
-
-      {story.enhancedStory && (
-        <div className="mt-6 p-card">
-          <h3 className="p-text font-medium mb-2">Enhanced Story Preview</h3>
-          <p className="p-text p-text-subdued">{story.enhancedStory}</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 } 
