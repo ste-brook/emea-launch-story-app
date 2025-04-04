@@ -2,31 +2,29 @@
 .shiny-button {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #a1c4fd, #c2e9fb);
-  background-size: 300% 300%;
-  animation: gradient-shift 3s ease infinite;
+  background: var(--p-color-bg-primary);
+  color: var(--p-color-text-on-primary);
   border: none;
-  color: #333;
-  font-weight: bold;
-  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 
-              0 0 20px rgba(255, 255, 255, 0.3),
-              0 0 30px rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+  font-weight: 500;
+  transition: all 0.2s ease;
 }
 
-.shiny-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 
-              0 0 25px rgba(255, 255, 255, 0.5),
-              0 0 35px rgba(255, 255, 255, 0.3);
+.shiny-button:disabled {
+  background: var(--p-color-bg-disabled);
+  color: var(--p-color-text-on-disabled);
+  cursor: not-allowed;
 }
 
-.shiny-button:active {
-  transform: translateY(1px);
+/* Gold button effect */
+.gold-button {
+  position: relative;
+  overflow: hidden;
+  border: none !important;
+  background: linear-gradient(45deg, #FFD700, #FFA500) !important;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3) !important;
 }
 
-.shiny-button::before {
+.gold-button::before {
   content: '';
   position: absolute;
   top: -50%;
@@ -40,22 +38,10 @@
     rgba(255, 255, 255, 0) 100%
   );
   transform: rotate(30deg);
-  animation: shine 3s infinite;
+  animation: gold-shine 3s infinite;
 }
 
-@keyframes gradient-shift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes shine {
+@keyframes gold-shine {
   0% {
     transform: translateX(-100%) rotate(30deg);
   }
@@ -67,21 +53,25 @@
 /* Sparkle animation for the button */
 .button-sparkle {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: white;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 50%;
   pointer-events: none;
-  animation: sparkle 1.5s ease-in-out forwards;
+  box-shadow: 
+    0 0 3px rgba(255, 255, 255, 0.8),
+    0 0 6px rgba(255, 255, 255, 0.6),
+    0 0 9px rgba(255, 255, 255, 0.4);
+  animation: sparkle-twinkle 1.5s ease-in-out forwards;
 }
 
-@keyframes sparkle {
+@keyframes sparkle-twinkle {
   0% {
     transform: scale(0) rotate(0deg);
     opacity: 0;
   }
   50% {
-    transform: scale(1) rotate(180deg);
+    transform: scale(1.5) rotate(180deg);
     opacity: 1;
   }
   100% {

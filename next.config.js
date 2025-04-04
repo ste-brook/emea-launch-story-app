@@ -1,18 +1,24 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    unoptimized: true,
+  },
   async rewrites() {
-    return [];
+    return [
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*',
+      },
+    ];
   },
   webpack: (config) => {
     return config;
   },
-  output: 'export',
-  basePath: process.env.NODE_ENV === 'production' ? '/launch-story-app' : '',
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/launch-story-app/' : '',
-  images: {
-    unoptimized: true,
-  },
+  ...(process.env.NODE_ENV === 'production' ? {
+    basePath: '/launch-story-app',
+    assetPrefix: '/launch-story-app/',
+  } : {})
 }
 
 module.exports = nextConfig

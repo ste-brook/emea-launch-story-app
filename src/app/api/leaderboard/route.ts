@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
+// Configure the API route to be dynamic
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Initialize Google Sheets API
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -35,7 +39,7 @@ export async function GET() {
     // Get all data from the sheet
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: `${sheetName}!A:G`,
+      range: `${sheetName}!A:H`,
     });
 
     if (!response.data.values || response.data.values.length <= 1) {
@@ -56,7 +60,7 @@ export async function GET() {
     const consultantCounts: Record<string, number> = {};
     
     rows.forEach(row => {
-      // The first column (index 0) contains the launch consultant name
+      // Column A contains the launch consultant name
       const consultantName = row[0];
       if (consultantName && consultantName !== 'Launch Consultant') {
         consultantCounts[consultantName] = (consultantCounts[consultantName] || 0) + 1;

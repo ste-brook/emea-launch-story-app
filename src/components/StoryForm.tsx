@@ -398,13 +398,13 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
           {!story.enhancedStory && (
             <div className="flex justify-start pt-2">
-              <SparklyButton
+              <button
                 onClick={enhanceStory}
                 disabled={isEnhancing}
-                className="p-button py-1 text-sm"
+                className="p-button p-button-primary py-1 text-sm"
               >
                 {isEnhancing ? 'Processing...' : 'Enhance Story'}
-              </SparklyButton>
+              </button>
             </div>
           )}
         </form>
@@ -434,18 +434,18 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                     placeholder="Add instructions to improve the story..."
                   />
                   <div className="flex justify-between items-center mt-4">
-                    <SparklyButton
+                    <button
                       onClick={handleUpdateStory}
                       disabled={isEnhancing || isUpdating}
-                      className="p-button py-1 text-sm"
+                      className="p-button p-button-primary py-1 text-sm"
                     >
                       {isEnhancing || isUpdating ? 'Processing...' : 'Update Story'}
-                    </SparklyButton>
+                    </button>
                     
                     <button
                       type="submit"
                       onClick={submitStory}
-                      className="p-button p-button-primary py-1 text-sm"
+                      className="p-button p-button-primary gold-button py-1 text-sm"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? 'Submitting...' : 'Submit Story'}
