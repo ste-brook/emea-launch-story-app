@@ -223,6 +223,10 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
         setStory(resetStory);
         setIsSubmitting(false);
         setShowCelebration(false);
+        
+        // Dispatch a custom event to notify that a story was submitted
+        // This will be used by the LeaderBoard component to refresh its data
+        window.dispatchEvent(new CustomEvent('storySubmitted'));
       }, 3000);
     } catch (err) {
       console.error(err);
