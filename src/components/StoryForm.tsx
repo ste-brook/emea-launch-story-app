@@ -5,9 +5,9 @@ import { Sparkles } from './Sparkles';
 import { Celebration } from './Celebration';
 import SparklyButton from './SparklyButton';
 
-type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
+export type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
 
-interface Story {
+export interface Story {
   merchantName: string;
   submissionDate: string;
   notes: string;
@@ -242,7 +242,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   };
 
   return (
-    <div className="p-card">
+    <div className="p-card w-full">
       <Sparkles isActive={showSparkles} />
       <Celebration isActive={showCelebration} consultantName={story.launchConsultant} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

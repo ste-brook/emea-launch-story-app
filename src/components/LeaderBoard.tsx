@@ -55,7 +55,7 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
   }, []);
 
   return (
-    <div className="p-card bg-[var(--p-color-bg-surface)]/95 backdrop-blur-lg rounded-[var(--p-border-radius-large)] p-[var(--p-space-4)] h-full flex flex-col">
+    <div className="p-card w-full bg-[var(--p-color-bg-surface)]/95 backdrop-blur-lg rounded-[var(--p-border-radius-large)] p-[var(--p-space-4)] h-full flex flex-col">
       <h2 className="text-lg font-bold text-[var(--p-color-text-primary)] mb-[var(--p-space-4)]">
         Top Contributors
       </h2>
