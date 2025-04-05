@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
+import DiscoToggle from '@/components/DiscoToggle';
 import Image from 'next/image'
 
 const inter = Inter({ subsets: ["latin"] });
@@ -34,8 +35,9 @@ export default function RootLayout({
                   EMEA Launch Story Submissions
                 </h1>
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center space-x-2">
                 <ThemeToggle />
+                <DiscoToggle />
               </div>
             </div>
           </div>

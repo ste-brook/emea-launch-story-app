@@ -227,3 +227,130 @@ textarea.p-input {
   outline: none;
   box-shadow: 0 0 0 2px var(--p-color-bg-primary), 0 0 0 4px var(--p-color-border-focused);
 }
+
+/* Disco Mode Styles */
+.disco-mode-active {
+  --disco-primary: #ff00ff;
+  --disco-secondary: #00ffff;
+  --disco-tertiary: #ffff00;
+  --disco-quaternary: #ff00aa;
+  --disco-quinary: #00ffaa;
+}
+
+.disco-mode-active {
+  animation: discoBackground 5s infinite alternate;
+}
+
+.disco-mode-active .p-card {
+  animation: discoCard 3s infinite alternate;
+  border: 2px solid var(--disco-primary);
+  box-shadow: 0 0 15px var(--disco-primary);
+}
+
+.disco-mode-active button:not([aria-label="Toggle theme"]) {
+  animation: discoButton 2s infinite alternate;
+  border: 1px solid var(--disco-secondary);
+  box-shadow: 0 0 10px var(--disco-secondary);
+}
+
+.disco-mode-active button[aria-label="Toggle theme"] {
+  background-color: var(--p-color-bg-surface-secondary);
+  color: var(--p-color-text);
+  border: 1px solid var(--p-color-border);
+  box-shadow: 0 0 5px var(--p-color-border);
+}
+
+.disco-mode-active button[aria-label="Toggle theme"] svg {
+  color: var(--p-color-text);
+}
+
+.disco-mode-active input, 
+.disco-mode-active select, 
+.disco-mode-active textarea {
+  animation: discoInput 4s infinite alternate;
+  border: 1px solid var(--disco-tertiary);
+  box-shadow: 0 0 8px var(--disco-tertiary);
+}
+
+.disco-mode-active .p-button-primary {
+  background: linear-gradient(45deg, var(--disco-primary), var(--disco-secondary));
+  border: none;
+  box-shadow: 0 0 15px var(--disco-primary);
+}
+
+.disco-mode-active .p-button-secondary {
+  background: linear-gradient(45deg, var(--disco-tertiary), var(--disco-quaternary));
+  border: none;
+  box-shadow: 0 0 15px var(--disco-tertiary);
+}
+
+@keyframes discoBackground {
+  0% {
+    background: linear-gradient(45deg, #000000, #1a0033);
+  }
+  25% {
+    background: linear-gradient(45deg, #1a0033, #330066);
+  }
+  50% {
+    background: linear-gradient(45deg, #330066, #4d0099);
+  }
+  75% {
+    background: linear-gradient(45deg, #4d0099, #6600cc);
+  }
+  100% {
+    background: linear-gradient(45deg, #6600cc, #8000ff);
+  }
+}
+
+@keyframes discoCard {
+  0% {
+    border-color: var(--disco-primary);
+    box-shadow: 0 0 15px var(--disco-primary);
+  }
+  33% {
+    border-color: var(--disco-secondary);
+    box-shadow: 0 0 15px var(--disco-secondary);
+  }
+  66% {
+    border-color: var(--disco-tertiary);
+    box-shadow: 0 0 15px var(--disco-tertiary);
+  }
+  100% {
+    border-color: var(--disco-quaternary);
+    box-shadow: 0 0 15px var(--disco-quaternary);
+  }
+}
+
+@keyframes discoButton {
+  0% {
+    border-color: var(--disco-primary);
+    box-shadow: 0 0 10px var(--disco-primary);
+  }
+  50% {
+    border-color: var(--disco-secondary);
+    box-shadow: 0 0 10px var(--disco-secondary);
+  }
+  100% {
+    border-color: var(--disco-tertiary);
+    box-shadow: 0 0 10px var(--disco-tertiary);
+  }
+}
+
+@keyframes discoInput {
+  0% {
+    border-color: var(--disco-primary);
+    box-shadow: 0 0 8px var(--disco-primary);
+  }
+  33% {
+    border-color: var(--disco-secondary);
+    box-shadow: 0 0 8px var(--disco-secondary);
+  }
+  66% {
+    border-color: var(--disco-tertiary);
+    box-shadow: 0 0 8px var(--disco-tertiary);
+  }
+  100% {
+    border-color: var(--disco-quaternary);
+    box-shadow: 0 0 8px var(--disco-quaternary);
+  }
+}
