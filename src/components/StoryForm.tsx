@@ -14,9 +14,11 @@ interface Story {
   team: string;
   salesforceCaseLink: string;
   lineOfBusiness: string[];
-  gmv: string;
   storeType: string;
   launchDate: string;
+  gmvD2C: string;
+  gmvB2B: string;
+  gmvPOSPro: string;
 }
 
 interface StoryFormProps {
@@ -80,13 +82,22 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       errors.submissionDate = 'Submission date is required';
     }
 
-    if (!story.gmv) {
-      errors.gmv = 'GMV is required';
-    }
-
     if (!story.lineOfBusiness || story.lineOfBusiness.length === 0) {
       errors.lineOfBusiness = 'At least one line of business is required';
     }
+
+    // Validate GMV for selected lines of business
+    story.lineOfBusiness?.forEach(lob => {
+      if (lob === 'D2C' && !story.gmvD2C) {
+        errors.gmvD2C = 'GMV for D2C is required';
+      }
+      if (lob === 'B2B' && !story.gmvB2B) {
+        errors.gmvB2B = 'GMV for B2B is required';
+      }
+      if (lob === 'POS Pro' && !story.gmvPOSPro) {
+        errors.gmvPOSPro = 'GMV for POS Pro is required';
+      }
+    });
     
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -213,9 +224,11 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
           team: '',
           salesforceCaseLink: '',
           lineOfBusiness: [],
-          gmv: '',
           storeType: '',
           launchDate: '',
+          gmvD2C: '',
+          gmvB2B: '',
+          gmvPOSPro: '',
         };
         
         setStory(emptyStory);
@@ -337,7 +350,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               <label className="block p-text font-medium mb-1 text-sm">
                 Line of Business
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-2">
                 {['D2C', 'B2B', 'POS Pro'].map((business) => (
                   <label key={business} className="flex items-center space-x-1 cursor-pointer">
                     <input
@@ -353,24 +366,67 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               {fieldErrors.lineOfBusiness && (
                 <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.lineOfBusiness}</p>
               )}
-            </div>
-          </div>
 
-          <div>
-            <label htmlFor="gmv" className="block p-text font-medium mb-1 text-sm">
-              GMV
-            </label>
-            <input
-              type="text"
-              id="gmv"
-              value={story.gmv}
-              onChange={(e) => setStory({ ...story, gmv: e.target.value })}
-              className="p-input w-full py-1"
-              placeholder="Enter GMV per LoB (e.g. D2C 20M, B2B 8M)"
-            />
-            {fieldErrors.gmv && (
-              <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.gmv}</p>
-            )}
+              {/* Dynamic GMV Fields */}
+              <div className="space-y-3 mt-4">
+                {story.lineOfBusiness?.includes('D2C') && (
+                  <div>
+                    <label htmlFor="gmvD2C" className="block p-text font-medium mb-1 text-sm">
+                      D2C GMV
+                    </label>
+                    <input
+                      type="text"
+                      id="gmvD2C"
+                      value={story.gmvD2C || ''}
+                      onChange={(e) => setStory({ ...story, gmvD2C: e.target.value })}
+                      className="p-input w-full py-1"
+                      placeholder="Enter D2C GMV"
+                    />
+                    {fieldErrors.gmvD2C && (
+                      <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.gmvD2C}</p>
+                    )}
+                  </div>
+                )}
+
+                {story.lineOfBusiness?.includes('B2B') && (
+                  <div>
+                    <label htmlFor="gmvB2B" className="block p-text font-medium mb-1 text-sm">
+                      B2B GMV
+                    </label>
+                    <input
+                      type="text"
+                      id="gmvB2B"
+                      value={story.gmvB2B || ''}
+                      onChange={(e) => setStory({ ...story, gmvB2B: e.target.value })}
+                      className="p-input w-full py-1"
+                      placeholder="Enter B2B GMV"
+                    />
+                    {fieldErrors.gmvB2B && (
+                      <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.gmvB2B}</p>
+                    )}
+                  </div>
+                )}
+
+                {story.lineOfBusiness?.includes('POS Pro') && (
+                  <div>
+                    <label htmlFor="gmvPOSPro" className="block p-text font-medium mb-1 text-sm">
+                      POS Pro GMV
+                    </label>
+                    <input
+                      type="text"
+                      id="gmvPOSPro"
+                      value={story.gmvPOSPro || ''}
+                      onChange={(e) => setStory({ ...story, gmvPOSPro: e.target.value })}
+                      className="p-input w-full py-1"
+                      placeholder="Enter Retail GMV"
+                    />
+                    {fieldErrors.gmvPOSPro && (
+                      <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.gmvPOSPro}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           <div>

@@ -20,7 +20,6 @@ const HEADERS = [
   'Salesforce Case Link',
   'Merchant Segment',
   'GMV',
-  'Line of Business',
   'Story',
   'Submission Date'
 ];
@@ -66,7 +65,7 @@ export async function POST(request: Request) {
       console.log('Checking if headers exist in the sheet');
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: process.env.GOOGLE_SHEET_ID,
-        range: `${sheetName}!A1:H1`,
+        range: `${sheetName}!A1:G1`,
       });
 
       if (!response.data.values || response.data.values.length === 0) {
@@ -74,7 +73,7 @@ export async function POST(request: Request) {
         // Headers don't exist, create them
         await sheets.spreadsheets.values.update({
           spreadsheetId: process.env.GOOGLE_SHEET_ID,
-          range: `${sheetName}!A1:H1`,
+          range: `${sheetName}!A1:G1`,
           valueInputOption: 'USER_ENTERED',
           requestBody: {
             values: [HEADERS],
@@ -94,6 +93,14 @@ export async function POST(request: Request) {
       ? story.lineOfBusiness.join(', ')
       : story.lineOfBusiness || '';
 
+    // Combine GMV values into a single string
+    const combinedGMV = story.lineOfBusiness?.map((lob: string) => {
+      if (lob === 'D2C' && story.gmvD2C) return `D2C: ${story.gmvD2C}`;
+      if (lob === 'B2B' && story.gmvB2B) return `B2B: ${story.gmvB2B}`;
+      if (lob === 'POS Pro' && story.gmvPOSPro) return `Retail: ${story.gmvPOSPro}`;
+      return '';
+    }).filter(Boolean).join(', ');
+
     // Prepare the data for Google Sheets with the correct column order
     const values = [
       [
@@ -101,10 +108,9 @@ export async function POST(request: Request) {
         (story.merchantName || '').trim(), // Column B: Merchant Name
         (story.salesforceCaseLink || '').trim(), // Column C: Salesforce Case Link
         (story.storeType || '').trim(), // Column D: Merchant Segment
-        (story.gmv || '').trim(), // Column E: GMV
-        lineOfBusinessString.trim(), // Column F: Line of Business
-        (story.enhancedStory || '').trim(), // Column G: Story
-        (story.submissionDate || new Date().toISOString().split('T')[0]).trim(), // Column H: Submission Date
+        combinedGMV.trim(), // Column E: GMV
+        (story.enhancedStory || '').trim(), // Column F: Story
+        (story.submissionDate || new Date().toISOString().split('T')[0]).trim(), // Column G: Submission Date
       ],
     ];
 
@@ -114,7 +120,7 @@ export async function POST(request: Request) {
     console.log('Appending data to Google Sheet');
     const appendResponse = await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: `${sheetName}!A:H`, // Updated range to match all columns
+      range: `${sheetName}!A:G`, // Updated range to match all columns
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values,

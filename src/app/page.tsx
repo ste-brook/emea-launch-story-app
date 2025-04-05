@@ -13,9 +13,11 @@ interface Story {
   team: string;
   salesforceCaseLink: string;
   lineOfBusiness: string[];
-  gmv: string;
   storeType: string;
   launchDate: string;
+  gmvD2C: string;
+  gmvB2B: string;
+  gmvPOSPro: string;
 }
 
 export default function Home() {
@@ -28,9 +30,11 @@ export default function Home() {
     team: '',
     salesforceCaseLink: '',
     lineOfBusiness: [],
-    gmv: '',
     storeType: '',
     launchDate: '',
+    gmvD2C: '',
+    gmvB2B: '',
+    gmvPOSPro: '',
   });
 
   return (
