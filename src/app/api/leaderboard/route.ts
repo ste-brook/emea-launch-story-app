@@ -39,7 +39,7 @@ export async function GET() {
     // Get all data from the sheet
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: `${sheetName}!A:H`,
+      range: `${sheetName}!A:J`,
     });
 
     if (!response.data.values || response.data.values.length <= 1) {
