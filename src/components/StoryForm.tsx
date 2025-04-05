@@ -5,6 +5,8 @@ import { Sparkles } from './Sparkles';
 import { Celebration } from './Celebration';
 import SparklyButton from './SparklyButton';
 
+type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
+
 interface Story {
   merchantName: string;
   submissionDate: string;
@@ -13,8 +15,12 @@ interface Story {
   launchConsultant: string;
   team: string;
   salesforceCaseLink: string;
-  lineOfBusiness: string[];
-  gmv: string;
+  lineOfBusiness: BusinessType[];
+  gmv: {
+    D2C?: string;
+    B2B?: string;
+    'POS Pro'?: string;
+  };
   storeType: string;
   launchDate: string;
 }
@@ -41,8 +47,8 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     setStory({
       ...story,
       lineOfBusiness: checked
-        ? [...(story.lineOfBusiness || []), business]
-        : (story.lineOfBusiness || []).filter((b: string) => b !== business),
+        ? [...(story.lineOfBusiness || []), business as BusinessType]
+        : (story.lineOfBusiness || []).filter((b: BusinessType) => b !== business as BusinessType),
     });
   };
 
@@ -80,13 +86,16 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       errors.submissionDate = 'Submission date is required';
     }
 
-    if (!story.gmv) {
-      errors.gmv = 'GMV is required';
-    }
-
     if (!story.lineOfBusiness || story.lineOfBusiness.length === 0) {
       errors.lineOfBusiness = 'At least one line of business is required';
     }
+
+    // Validate GMV for each selected business type
+    story.lineOfBusiness.forEach((business: BusinessType) => {
+      if (!story.gmv[business]) {
+        errors[`gmv_${business}`] = `GMV for ${business} is required`;
+      }
+    });
     
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -213,7 +222,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
           team: '',
           salesforceCaseLink: '',
           lineOfBusiness: [],
-          gmv: '',
+          gmv: {},
           storeType: '',
           launchDate: '',
         };
@@ -236,11 +245,11 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     <div className="p-card">
       <Sparkles isActive={showSparkles} />
       <Celebration isActive={showCelebration} consultantName={story.launchConsultant} />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <form onSubmit={submitStory} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <form onSubmit={submitStory} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="launchConsultant" className="block p-text font-medium mb-1 text-sm">
+              <label htmlFor="launchConsultant" className="block p-text font-medium mb-2 text-sm">
                 Launch Consultant
               </label>
               <input
@@ -248,16 +257,16 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 id="launchConsultant"
                 value={story.launchConsultant}
                 onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
-                className="p-input w-full py-1"
+                className="p-input w-full py-2"
                 placeholder="Enter your name"
               />
               {fieldErrors.launchConsultant && (
-                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.launchConsultant}</p>
+                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.launchConsultant}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="merchantName" className="block p-text font-medium mb-1 text-sm">
+              <label htmlFor="merchantName" className="block p-text font-medium mb-2 text-sm">
                 Merchant Name
               </label>
               <input
@@ -265,18 +274,18 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 id="merchantName"
                 value={story.merchantName}
                 onChange={(e) => setStory({ ...story, merchantName: e.target.value })}
-                className="p-input w-full py-1"
+                className="p-input w-full py-2"
                 placeholder="Enter merchant name"
               />
               {fieldErrors.merchantName && (
-                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.merchantName}</p>
+                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.merchantName}</p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="salesforceCaseLink" className="block p-text font-medium mb-1 text-sm">
+              <label htmlFor="salesforceCaseLink" className="block p-text font-medium mb-2 text-sm">
                 Salesforce Case Link
               </label>
               <input
@@ -284,16 +293,16 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 id="salesforceCaseLink"
                 value={story.salesforceCaseLink}
                 onChange={(e) => setStory({ ...story, salesforceCaseLink: e.target.value })}
-                className="p-input w-full py-1"
+                className="p-input w-full py-2"
                 placeholder="Enter Salesforce case link"
               />
               {fieldErrors.salesforceCaseLink && (
-                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.salesforceCaseLink}</p>
+                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.salesforceCaseLink}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="submissionDate" className="block p-text font-medium mb-1 text-sm">
+              <label htmlFor="submissionDate" className="block p-text font-medium mb-2 text-sm">
                 Submission Date
               </label>
               <input
@@ -301,20 +310,20 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 id="submissionDate"
                 value={story.submissionDate}
                 onChange={(e) => setStory({ ...story, submissionDate: e.target.value })}
-                className="p-input w-full py-1"
+                className="p-input w-full py-2"
               />
               {fieldErrors.submissionDate && (
-                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.submissionDate}</p>
+                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.submissionDate}</p>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block p-text font-medium mb-1 text-sm">
+              <label className="block p-text font-medium mb-2 text-sm">
                 Merchant Segment
               </label>
-              <div className="flex gap-2">
+              <div className="flex gap-4">
                 {['Mid-Market', 'Large'].map((segment) => (
                   <label key={segment} className="flex items-center cursor-pointer no-underline">
                     <input
@@ -324,25 +333,25 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                       onChange={() => handleMerchantSegmentChange(segment)}
                       className="p-input"
                     />
-                    <span className="p-text text-sm no-underline ml-1">{segment}</span>
+                    <span className="p-text text-sm no-underline ml-2">{segment}</span>
                   </label>
                 ))}
               </div>
               {fieldErrors.storeType && (
-                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.storeType}</p>
+                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.storeType}</p>
               )}
             </div>
 
             <div>
-              <label className="block p-text font-medium mb-1 text-sm">
+              <label className="block p-text font-medium mb-2 text-sm">
                 Line of Business
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-4">
                 {['D2C', 'B2B', 'POS Pro'].map((business) => (
-                  <label key={business} className="flex items-center space-x-1 cursor-pointer">
+                  <label key={business} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={story.lineOfBusiness?.includes(business) || false}
+                      checked={story.lineOfBusiness?.includes(business as BusinessType) || false}
                       onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
                       className="p-input"
                     />
@@ -351,57 +360,113 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 ))}
               </div>
               {fieldErrors.lineOfBusiness && (
-                <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.lineOfBusiness}</p>
+                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.lineOfBusiness}</p>
               )}
             </div>
           </div>
 
-          <div>
-            <label htmlFor="gmv" className="block p-text font-medium mb-1 text-sm">
-              GMV
-            </label>
-            <input
-              type="text"
-              id="gmv"
-              value={story.gmv}
-              onChange={(e) => setStory({ ...story, gmv: e.target.value })}
-              className="p-input w-full py-1"
-              placeholder="Enter GMV per LoB (e.g. D2C 20M, B2B 8M)"
-            />
-            {fieldErrors.gmv && (
-              <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.gmv}</p>
-            )}
-          </div>
+          {story.lineOfBusiness.length > 0 && (
+            <div className="mt-4">
+              <label className="block p-text font-medium mb-2 text-sm">
+                GMV by Business Type
+              </label>
+              <div className="space-y-4">
+                {story.lineOfBusiness.includes('D2C') && (
+                  <div>
+                    <label htmlFor="gmv_d2c" className="block p-text text-sm mb-2">
+                      D2C GMV
+                    </label>
+                    <input
+                      type="text"
+                      id="gmv_d2c"
+                      value={story.gmv.D2C || ''}
+                      onChange={(e) => setStory({
+                        ...story,
+                        gmv: { ...story.gmv, D2C: e.target.value }
+                      })}
+                      className="p-input w-full py-2"
+                      placeholder="Enter D2C GMV"
+                    />
+                    {fieldErrors.gmv_D2C && (
+                      <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.gmv_D2C}</p>
+                    )}
+                  </div>
+                )}
+                {story.lineOfBusiness.includes('B2B') && (
+                  <div>
+                    <label htmlFor="gmv_b2b" className="block p-text text-sm mb-2">
+                      B2B GMV
+                    </label>
+                    <input
+                      type="text"
+                      id="gmv_b2b"
+                      value={story.gmv.B2B || ''}
+                      onChange={(e) => setStory({
+                        ...story,
+                        gmv: { ...story.gmv, B2B: e.target.value }
+                      })}
+                      className="p-input w-full py-2"
+                      placeholder="Enter B2B GMV"
+                    />
+                    {fieldErrors.gmv_B2B && (
+                      <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.gmv_B2B}</p>
+                    )}
+                  </div>
+                )}
+                {story.lineOfBusiness.includes('POS Pro') && (
+                  <div>
+                    <label htmlFor="gmv_pos" className="block p-text text-sm mb-2">
+                      POS Pro GMV
+                    </label>
+                    <input
+                      type="text"
+                      id="gmv_pos"
+                      value={story.gmv['POS Pro'] || ''}
+                      onChange={(e) => setStory({
+                        ...story,
+                        gmv: { ...story.gmv, 'POS Pro': e.target.value }
+                      })}
+                      className="p-input w-full py-2"
+                      placeholder="Enter POS Pro GMV"
+                    />
+                    {fieldErrors.gmv_POS_Pro && (
+                      <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.gmv_POS_Pro}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <div>
-            <label htmlFor="notes" className="block p-text font-medium mb-1 text-sm">
+            <label htmlFor="notes" className="block p-text font-medium mb-2 text-sm">
               Story Notes
             </label>
             <textarea
               id="notes"
               value={story.notes}
               onChange={(e) => setStory({ ...story, notes: e.target.value })}
-              className="p-input w-full"
-              rows={3}
+              className="p-input w-full py-2"
+              rows={4}
               placeholder="Enter your story notes"
             />
             {fieldErrors.notes && (
-              <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors.notes}</p>
+              <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.notes}</p>
             )}
           </div>
 
           {error && (
-            <div className="p-badge p-badge-critical text-xs">
+            <div className="p-badge p-badge-critical text-xs p-2">
               {error}
             </div>
           )}
 
           {!story.enhancedStory && (
-            <div className="flex justify-start pt-2">
+            <div className="flex justify-start pt-4">
               <button
                 onClick={enhanceStory}
                 disabled={isEnhancing}
-                className="p-button p-button-primary py-1 text-sm"
+                className="p-button p-button-primary py-2 px-4 text-sm"
               >
                 {isEnhancing ? 'Processing...' : 'Enhance Story'}
               </button>
@@ -410,34 +475,34 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
         </form>
 
         <div className="p-card bg-[var(--p-color-bg-surface)] rounded-[var(--p-border-radius-base)] shadow-[var(--p-shadow-card)] border border-[var(--p-color-border-subdued)]">
-          <div className="p-[var(--p-space-3)]">
-            <h3 className="p-text font-medium mb-2 text-sm">Enhanced Story</h3>
+          <div className="p-[var(--p-space-4)]">
+            <h3 className="p-text font-medium mb-4 text-sm">Enhanced Story</h3>
             {story.enhancedStory ? (
               <>
                 <textarea
                   value={story.enhancedStory}
                   onChange={(e) => setStory({ ...story, enhancedStory: e.target.value })}
-                  className="p-input w-full min-h-[300px] bg-[var(--p-color-bg-surface-secondary)] text-sm"
+                  className="p-input w-full min-h-[300px] bg-[var(--p-color-bg-surface-secondary)] text-sm p-4"
                   placeholder="Enhanced story will appear here..."
                 />
                 
-                <div className="mt-4">
-                  <label htmlFor="additionalPrompt" className="block p-text font-medium mb-1 text-sm">
+                <div className="mt-6">
+                  <label htmlFor="additionalPrompt" className="block p-text font-medium mb-2 text-sm">
                     Additional Instructions
                   </label>
                   <textarea
                     id="additionalPrompt"
                     value={additionalPrompt}
                     onChange={(e) => setAdditionalPrompt(e.target.value)}
-                    className="p-input w-full"
-                    rows={1}
+                    className="p-input w-full p-2"
+                    rows={2}
                     placeholder="Add instructions to improve the story..."
                   />
-                  <div className="flex justify-between items-center mt-4">
+                  <div className="flex justify-between items-center mt-6">
                     <button
                       onClick={handleUpdateStory}
                       disabled={isEnhancing || isUpdating}
-                      className="p-button p-button-primary py-1 text-sm"
+                      className="p-button p-button-primary py-2 px-4 text-sm"
                     >
                       {isEnhancing || isUpdating ? 'Processing...' : 'Update Story'}
                     </button>
@@ -445,7 +510,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                     <button
                       type="submit"
                       onClick={submitStory}
-                      className="p-button p-button-primary gold-button py-1 text-sm"
+                      className="p-button p-button-primary gold-button py-2 px-4 text-sm"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? 'Submitting...' : 'Submit Story'}
@@ -454,12 +519,12 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 </div>
               </>
             ) : (
-              <div className="min-h-[300px] bg-[var(--p-color-bg-surface-secondary)] rounded-[var(--p-border-radius-base)] p-[var(--p-space-3)] flex flex-col items-center justify-center text-center">
-                <div className="text-[var(--p-color-text-subdued)] mb-[var(--p-space-3)]">
-                  <svg className="w-10 h-10 mx-auto mb-[var(--p-space-2)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="min-h-[300px] bg-[var(--p-color-bg-surface-secondary)] rounded-[var(--p-border-radius-base)] p-[var(--p-space-4)] flex flex-col items-center justify-center text-center">
+                <div className="text-[var(--p-color-text-subdued)] mb-[var(--p-space-4)]">
+                  <svg className="w-12 h-12 mx-auto mb-[var(--p-space-3)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
-                  <p className="text-base font-medium mb-[var(--p-space-1)]">Your Enhanced Story Awaits</p>
+                  <p className="text-base font-medium mb-[var(--p-space-2)]">Your Enhanced Story Awaits</p>
                   <p className="text-xs">Fill in the story details and click "Enhance Story" to generate an AI-powered version of your success story.</p>
                 </div>
               </div>
