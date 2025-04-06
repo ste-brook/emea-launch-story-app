@@ -8,25 +8,37 @@ const PROJECT_ID = process.env.GOOGLE_SHEETS_PROJECT_ID;
 
 // Validate environment variables
 const validateEnvVars = () => {
-  if (!SPREADSHEET_ID) throw new Error('GOOGLE_SHEETS_ID is not defined');
-  if (!CLIENT_EMAIL) throw new Error('GOOGLE_SHEETS_CLIENT_EMAIL is not defined');
-  if (!PRIVATE_KEY) throw new Error('GOOGLE_SHEETS_PRIVATE_KEY is not defined');
-  if (!PROJECT_ID) throw new Error('GOOGLE_SHEETS_PROJECT_ID is not defined');
+  const missingVars = [];
+  
+  if (!SPREADSHEET_ID) missingVars.push('GOOGLE_SHEETS_ID');
+  if (!CLIENT_EMAIL) missingVars.push('GOOGLE_SHEETS_CLIENT_EMAIL');
+  if (!PRIVATE_KEY) missingVars.push('GOOGLE_SHEETS_PRIVATE_KEY');
+  if (!PROJECT_ID) missingVars.push('GOOGLE_SHEETS_PROJECT_ID');
+  
+  if (missingVars.length > 0) {
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+  }
 };
 
 // Initialize Google Sheets API
 const initializeSheetsAPI = () => {
   validateEnvVars();
   
-  const auth = new google.auth.GoogleAuth({
-    credentials: {
-      client_email: CLIENT_EMAIL,
-      private_key: PRIVATE_KEY,
-    },
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
-  
-  return google.sheets({ version: 'v4', auth });
+  try {
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        client_email: CLIENT_EMAIL,
+        private_key: PRIVATE_KEY,
+        project_id: PROJECT_ID,
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    
+    return google.sheets({ version: 'v4', auth });
+  } catch (error) {
+    console.error('Error initializing Google Sheets API:', error);
+    throw new Error('Failed to initialize Google Sheets API');
+  }
 };
 
 // Singleton instance
@@ -42,9 +54,11 @@ const getSheetsAPI = () => {
 
 // Get sheet name
 export async function getSheetName() {
+  validateEnvVars();
   const sheets = getSheetsAPI();
   
   try {
+    console.log('Getting sheet name with spreadsheetId:', SPREADSHEET_ID);
     const response = await sheets.spreadsheets.get({
       spreadsheetId: SPREADSHEET_ID,
     });
