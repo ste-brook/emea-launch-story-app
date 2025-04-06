@@ -2,7 +2,7 @@ name: Deploy Next.js app to GitHub Pages
 
 on:
   push:
-    branches: [ "app-v1" ]
+    branches: ['app-v1']
   workflow_dispatch:
 
 permissions:
@@ -20,30 +20,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: 'npm'
-      
+          node-version: 20
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      
       - name: Install dependencies
         run: npm ci
-      
       - name: Build with Next.js
         run: npm run build
         env:
-          NODE_ENV: production
           GOOGLE_SHEETS_CLIENT_EMAIL: ${{ secrets.GOOGLE_SHEETS_CLIENT_EMAIL }}
           GOOGLE_SHEETS_PRIVATE_KEY: ${{ secrets.GOOGLE_SHEETS_PRIVATE_KEY }}
           GOOGLE_SHEETS_PROJECT_ID: ${{ secrets.GOOGLE_SHEETS_PROJECT_ID }}
           GOOGLE_SHEETS_ID: ${{ secrets.GOOGLE_SHEETS_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
-      
+          NODE_ENV: production
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
