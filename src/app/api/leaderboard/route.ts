@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSheetName, getAllData, getLeaderboardData } from '@/lib/googleSheets';
+import { getSheetName, getAllData, getLeaderboardData } from '@/api/integrations/googleSheets';
 
 // Configure the API route to be dynamic
 export const dynamic = 'force-dynamic';
