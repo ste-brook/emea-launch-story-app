@@ -9,7 +9,6 @@ export type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
 
 export interface Story {
   merchantName: string;
-  submissionDate: string;
   notes: string;
   enhancedStory: string;
   launchConsultant: string;
@@ -23,6 +22,7 @@ export interface Story {
   };
   launchStatus: string;
   launchDate: string;
+  opportunityRevenue: string;
 }
 
 interface StoryFormProps {
@@ -90,10 +90,6 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
     if (!story.launchStatus) {
       errors.launchStatus = 'Launch status is required';
-    }
-
-    if (!story.submissionDate) {
-      errors.submissionDate = 'Submission date is required';
     }
 
     if (!story.lineOfBusiness || story.lineOfBusiness.length === 0) {
@@ -225,7 +221,6 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       setTimeout(() => {
         const emptyStory: Story = {
           merchantName: '',
-          submissionDate: new Date().toISOString().split('T')[0],
           notes: '',
           enhancedStory: '',
           launchConsultant: '',
@@ -235,6 +230,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
           gmv: {},
           launchStatus: '',
           launchDate: '',
+          opportunityRevenue: '',
         };
         
         setStory(emptyStory);
@@ -312,18 +308,19 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
             </div>
 
             <div>
-              <label htmlFor="submissionDate" className="block p-text font-medium mb-2 text-sm">
-                Submission Date
+              <label htmlFor="opportunityRevenue" className="block p-text font-medium mb-2 text-sm">
+                Opportunity Revenue
               </label>
               <input
-                type="date"
-                id="submissionDate"
-                value={story.submissionDate}
-                onChange={(e) => setStory({ ...story, submissionDate: e.target.value })}
+                type="text"
+                id="opportunityRevenue"
+                value={story.opportunityRevenue}
+                onChange={(e) => setStory({ ...story, opportunityRevenue: e.target.value })}
                 className="p-input w-full py-2"
+                placeholder="Enter opportunity revenue"
               />
-              {fieldErrors.submissionDate && (
-                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.submissionDate}</p>
+              {fieldErrors.opportunityRevenue && (
+                <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.opportunityRevenue}</p>
               )}
             </div>
           </div>

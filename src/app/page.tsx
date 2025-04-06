@@ -8,7 +8,6 @@ import type { Story } from '@/components/StoryForm';
 export default function Home() {
   const [story, setStory] = useState<Story>({
     merchantName: '',
-    submissionDate: new Date().toISOString().split('T')[0],
     notes: '',
     enhancedStory: '',
     launchConsultant: '',
@@ -16,8 +15,9 @@ export default function Home() {
     salesforceCaseLink: '',
     lineOfBusiness: [],
     gmv: {},
-    storeType: '',
+    launchStatus: '',
     launchDate: '',
+    opportunityRevenue: '',
   });
 
   return (
