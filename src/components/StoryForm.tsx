@@ -52,6 +52,16 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     });
   };
 
+  const handleGmvChange = (business: BusinessType, value: string) => {
+    setStory({
+      ...story,
+      gmv: {
+        ...story.gmv,
+        [business]: value
+      }
+    });
+  };
+
   const handleMerchantSegmentChange = (segment: string) => {
     setStory({
       ...story,
@@ -346,17 +356,35 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               <label className="block p-text font-medium mb-2 text-sm">
                 Line of Business
               </label>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col space-y-3">
                 {['D2C', 'B2B', 'POS Pro'].map((business) => (
-                  <label key={business} className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={story.lineOfBusiness?.includes(business as BusinessType) || false}
-                      onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
-                      className="p-input"
-                    />
-                    <span className="p-text text-sm">{business}</span>
-                  </label>
+                  <div key={business} className="flex items-center space-x-3">
+                    <label className="flex items-center cursor-pointer w-24">
+                      <input
+                        type="checkbox"
+                        checked={story.lineOfBusiness?.includes(business as BusinessType) || false}
+                        onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
+                        className="p-input"
+                      />
+                      <span className="p-text text-sm ml-2">{business}</span>
+                    </label>
+                    
+                    {story.lineOfBusiness?.includes(business as BusinessType) && (
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          id={`gmv_${business.toLowerCase()}`}
+                          value={story.gmv[business as BusinessType] || ''}
+                          onChange={(e) => handleGmvChange(business as BusinessType, e.target.value)}
+                          className="p-input w-full py-1 text-sm"
+                          placeholder={business === 'POS Pro' ? 'Retail GMV' : `${business} GMV`}
+                        />
+                        {fieldErrors[`gmv_${business}`] && (
+                          <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors[`gmv_${business}`]}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
               {fieldErrors.lineOfBusiness && (
@@ -364,79 +392,6 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               )}
             </div>
           </div>
-
-          {story.lineOfBusiness.length > 0 && (
-            <div className="mt-4">
-              <label className="block p-text font-medium mb-2 text-sm">
-                GMV by Business Type
-              </label>
-              <div className="space-y-4">
-                {story.lineOfBusiness.includes('D2C') && (
-                  <div>
-                    <label htmlFor="gmv_d2c" className="block p-text text-sm mb-2">
-                      D2C GMV
-                    </label>
-                    <input
-                      type="text"
-                      id="gmv_d2c"
-                      value={story.gmv.D2C || ''}
-                      onChange={(e) => setStory({
-                        ...story,
-                        gmv: { ...story.gmv, D2C: e.target.value }
-                      })}
-                      className="p-input w-full py-2"
-                      placeholder="Enter D2C GMV"
-                    />
-                    {fieldErrors.gmv_D2C && (
-                      <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.gmv_D2C}</p>
-                    )}
-                  </div>
-                )}
-                {story.lineOfBusiness.includes('B2B') && (
-                  <div>
-                    <label htmlFor="gmv_b2b" className="block p-text text-sm mb-2">
-                      B2B GMV
-                    </label>
-                    <input
-                      type="text"
-                      id="gmv_b2b"
-                      value={story.gmv.B2B || ''}
-                      onChange={(e) => setStory({
-                        ...story,
-                        gmv: { ...story.gmv, B2B: e.target.value }
-                      })}
-                      className="p-input w-full py-2"
-                      placeholder="Enter B2B GMV"
-                    />
-                    {fieldErrors.gmv_B2B && (
-                      <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.gmv_B2B}</p>
-                    )}
-                  </div>
-                )}
-                {story.lineOfBusiness.includes('POS Pro') && (
-                  <div>
-                    <label htmlFor="gmv_pos" className="block p-text text-sm mb-2">
-                      POS Pro GMV
-                    </label>
-                    <input
-                      type="text"
-                      id="gmv_pos"
-                      value={story.gmv['POS Pro'] || ''}
-                      onChange={(e) => setStory({
-                        ...story,
-                        gmv: { ...story.gmv, 'POS Pro': e.target.value }
-                      })}
-                      className="p-input w-full py-2"
-                      placeholder="Enter POS Pro GMV"
-                    />
-                    {fieldErrors.gmv_POS_Pro && (
-                      <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.gmv_POS_Pro}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           <div>
             <label htmlFor="notes" className="block p-text font-medium mb-2 text-sm">
