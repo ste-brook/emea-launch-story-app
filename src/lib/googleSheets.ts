@@ -12,6 +12,9 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: 'v4', auth });
 
+// Store the spreadsheet ID
+const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
+
 // Headers for the Google Sheet
 export const HEADERS = [
   'Launch Consultant',
@@ -29,9 +32,13 @@ export const HEADERS = [
 // Get the sheet name to use
 export async function getSheetName(): Promise<string> {
   try {
+    if (!SPREADSHEET_ID) {
+      throw new Error('Google Sheets ID is not configured');
+    }
+
     // Get the spreadsheet metadata to find available sheets
     const spreadsheet = await sheets.spreadsheets.get({
-      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      spreadsheetId: SPREADSHEET_ID,
     });
 
     const sheetsList = spreadsheet.data.sheets?.map(sheet => sheet.properties?.title).filter(Boolean) || [];
@@ -54,9 +61,13 @@ export async function getSheetName(): Promise<string> {
 // Ensure headers exist in the sheet
 export async function ensureHeadersExist(sheetName: string): Promise<void> {
   try {
+    if (!SPREADSHEET_ID) {
+      throw new Error('Google Sheets ID is not configured');
+    }
+
     console.log('Checking if headers exist in the sheet');
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      spreadsheetId: SPREADSHEET_ID,
       range: `${sheetName}!A1:J1`,
     });
 
@@ -64,7 +75,7 @@ export async function ensureHeadersExist(sheetName: string): Promise<void> {
       console.log('Headers not found, creating them');
       // Headers don't exist, create them
       await sheets.spreadsheets.values.update({
-        spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+        spreadsheetId: SPREADSHEET_ID,
         range: `${sheetName}!A1:J1`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
@@ -84,9 +95,13 @@ export async function ensureHeadersExist(sheetName: string): Promise<void> {
 // Append data to the sheet
 export async function appendData(sheetName: string, values: any[][]): Promise<any> {
   try {
+    if (!SPREADSHEET_ID) {
+      throw new Error('Google Sheets ID is not configured');
+    }
+
     console.log('Appending data to Google Sheet');
     const appendResponse = await sheets.spreadsheets.values.append({
-      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      spreadsheetId: SPREADSHEET_ID,
       range: `${sheetName}!A:J`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
@@ -104,9 +119,13 @@ export async function appendData(sheetName: string, values: any[][]): Promise<an
 // Get all data from the sheet
 export async function getAllData(sheetName: string): Promise<any[][]> {
   try {
+    if (!SPREADSHEET_ID) {
+      throw new Error('Google Sheets ID is not configured');
+    }
+
     // Get all data from the sheet
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.GOOGLE_SHEETS_ID,
+      spreadsheetId: SPREADSHEET_ID,
       range: `${sheetName}!A:J`,
     });
 
