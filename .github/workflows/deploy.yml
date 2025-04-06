@@ -36,11 +36,12 @@ jobs:
       - name: Build with Next.js
         run: npm run build
         env:
-          GOOGLE_SHEETS_ID: ${{ secrets.GOOGLE_SHEETS_ID }}
           GOOGLE_SHEETS_CLIENT_EMAIL: ${{ secrets.GOOGLE_SHEETS_CLIENT_EMAIL }}
           GOOGLE_SHEETS_PRIVATE_KEY: ${{ secrets.GOOGLE_SHEETS_PRIVATE_KEY }}
           GOOGLE_SHEETS_PROJECT_ID: ${{ secrets.GOOGLE_SHEETS_PROJECT_ID }}
+          GOOGLE_SHEETS_ID: ${{ secrets.GOOGLE_SHEETS_ID }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
