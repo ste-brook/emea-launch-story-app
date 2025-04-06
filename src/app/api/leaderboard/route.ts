@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { getSheetName, getAllData, getLeaderboardData } from '@/api/integrations/googleSheets';
 
-// Configure the API route to be dynamic
-export const dynamic = 'force-dynamic';
+// Remove force-dynamic to allow static generation
+// export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET() {
