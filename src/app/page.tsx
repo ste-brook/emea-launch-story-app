@@ -21,7 +21,7 @@ export default function Home() {
   });
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-6">
       <div className="w-full">
         <StoryForm story={story} setStory={setStory} />
       </div>
