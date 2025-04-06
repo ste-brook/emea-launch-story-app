@@ -25,6 +25,10 @@
   --p-space-6: 1.5rem;
   --p-space-8: 2rem;
   --p-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --p-color-bg-surface-rgb: 255, 255, 255;
+  --p-color-bg-surface-secondary-rgb: 246, 246, 247;
+  --p-color-border-subdued-rgb: 225, 227, 229;
+  --p-color-border-focused-rgb: 0, 128, 96;
 }
 
 .dark {
@@ -43,6 +47,10 @@
   --p-color-bg-warning: #b98900;
   --p-color-bg-primary: #008060;
   --p-color-text-on-primary: #ffffff;
+  --p-color-bg-surface-rgb: 26, 28, 30;
+  --p-color-bg-surface-secondary-rgb: 44, 46, 48;
+  --p-color-border-subdued-rgb: 60, 62, 64;
+  --p-color-border-focused-rgb: 0, 128, 96;
 }
 
 @layer base {
@@ -226,4 +234,92 @@ textarea.p-input {
 .p-input[type="radio"]:focus {
   outline: none;
   box-shadow: 0 0 0 2px var(--p-color-bg-primary), 0 0 0 4px var(--p-color-border-focused);
+}
+
+/* Disco Mode Styles */
+.disco-mode {
+  position: relative;
+  overflow: hidden;
+}
+
+.disco-mode::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 0, 128, 0.1),
+    rgba(0, 255, 255, 0.1),
+    rgba(255, 255, 0, 0.1),
+    rgba(128, 0, 255, 0.1)
+  );
+  background-size: 400% 400%;
+  animation: disco-gradient 15s ease infinite;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.disco-mode .p-card {
+  backdrop-filter: blur(8px);
+  background: rgba(var(--p-color-bg-surface-rgb), 0.9);
+  transition: all 0.3s ease;
+}
+
+.disco-mode .p-input {
+  background: rgba(var(--p-color-bg-surface-secondary-rgb), 0.9);
+  backdrop-filter: blur(4px);
+  border-color: rgba(var(--p-color-border-subdued-rgb), 0.8);
+  transition: all 0.3s ease;
+}
+
+.disco-mode .p-input:focus {
+  border-color: rgba(var(--p-color-border-focused-rgb), 0.9);
+  box-shadow: 0 0 0 2px rgba(var(--p-color-border-focused-rgb), 0.2);
+}
+
+.disco-mode .p-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.disco-mode .p-button::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: disco-shine 3s infinite;
+}
+
+@keyframes disco-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes disco-shine {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
 }
