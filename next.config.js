@@ -6,7 +6,7 @@ const nextConfig = {
   },
   basePath: process.env.NODE_ENV === 'production' ? '/emea-launch-story-app' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/emea-launch-story-app/' : '',
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  output: undefined,
   async rewrites() {
     return [
       {
