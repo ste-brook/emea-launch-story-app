@@ -6,14 +6,7 @@ const nextConfig = {
   },
   basePath: process.env.NODE_ENV === 'production' ? '/emea-launch-story-app' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/emea-launch-story-app/' : '',
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
-    ];
-  },
+  output: 'export',
   webpack: (config) => {
     return config;
   },
