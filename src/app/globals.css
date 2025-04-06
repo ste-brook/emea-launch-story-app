@@ -242,6 +242,7 @@ textarea.p-input {
   overflow: hidden;
 }
 
+/* Faster, more vibrant gradient background */
 .disco-mode::before {
   content: '';
   position: fixed;
@@ -251,41 +252,66 @@ textarea.p-input {
   bottom: 0;
   background: linear-gradient(
     45deg,
-    rgba(255, 0, 128, 0.1),
-    rgba(0, 255, 255, 0.1),
-    rgba(255, 255, 0, 0.1),
-    rgba(128, 0, 255, 0.1)
+    rgba(255, 0, 128, 0.3), /* Increased opacity */
+    rgba(0, 255, 255, 0.3),
+    rgba(255, 255, 0, 0.3),
+    rgba(128, 0, 255, 0.3),
+    rgba(0, 255, 0, 0.3),  /* Added green */
+    rgba(255, 100, 0, 0.3) /* Added orange */
   );
-  background-size: 400% 400%;
-  animation: disco-gradient 15s ease infinite;
-  z-index: -1;
+  background-size: 600% 600%; /* Adjusted size for more colors */
+  animation: disco-gradient 4s linear infinite; /* Faster animation */
+  z-index: -2; /* Ensure it's behind the flash */
+  pointer-events: none;
+}
+
+/* Flashing color overlay */
+.disco-mode::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: red; /* Start color */
+  opacity: 0.15; /* Subtle flash opacity */
+  animation: disco-flash 0.5s linear infinite; /* Rapid flashing */
+  mix-blend-mode: overlay; /* Blend mode for interesting effects */
+  z-index: -1; /* Above gradient, below content */
   pointer-events: none;
 }
 
 .disco-mode .p-card {
-  backdrop-filter: blur(8px);
-  background: rgba(var(--p-color-bg-surface-rgb), 0.9);
+  backdrop-filter: blur(10px); /* Increased blur */
+  background: rgba(var(--p-color-bg-surface-rgb), 0.85); /* Slightly less transparent */
   transition: all 0.3s ease;
+  border: 1px solid transparent; /* Prepare for animated border */
+  animation: disco-border-color 4s linear infinite alternate; /* Animated border */
 }
 
 .disco-mode .p-input {
-  background: rgba(var(--p-color-bg-surface-secondary-rgb), 0.9);
-  backdrop-filter: blur(4px);
-  border-color: rgba(var(--p-color-border-subdued-rgb), 0.8);
+  background: rgba(var(--p-color-bg-surface-secondary-rgb), 0.85); /* Slightly less transparent */
+  backdrop-filter: blur(5px); /* Increased blur */
+  border: 1px solid transparent; /* Prepare for animated border */
+  animation: disco-border-color 4s linear infinite alternate-reverse; /* Offset border animation */
   transition: all 0.3s ease;
 }
 
 .disco-mode .p-input:focus {
-  border-color: rgba(var(--p-color-border-focused-rgb), 0.9);
-  box-shadow: 0 0 0 2px rgba(var(--p-color-border-focused-rgb), 0.2);
+  border-color: rgba(var(--p-color-border-focused-rgb), 1); /* Make focused border solid */
+  box-shadow: 0 0 0 3px rgba(var(--p-color-border-focused-rgb), 0.4);
+  animation: none; /* Stop border animation on focus */
 }
 
 .disco-mode .p-button {
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  border: 1px solid transparent; /* Prepare for animated border */
+  animation: disco-border-color 5s linear infinite; /* Button border animation */
 }
 
+/* Make button shine faster and more intense */
 .disco-mode .p-button::after {
   content: '';
   position: absolute;
@@ -296,30 +322,39 @@ textarea.p-input {
   background: linear-gradient(
     45deg,
     transparent,
-    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.3), /* More intense shine */
     transparent
   );
   transform: rotate(45deg);
-  animation: disco-shine 3s infinite;
+  animation: disco-shine 1.5s infinite linear; /* Faster shine */
 }
 
 @keyframes disco-gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @keyframes disco-shine {
-  0% {
-    transform: translateX(-100%) rotate(45deg);
-  }
-  100% {
-    transform: translateX(100%) rotate(45deg);
-  }
+  0% { transform: translateX(-100%) rotate(45deg); }
+  100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* New animation for flashing overlay */
+@keyframes disco-flash {
+  0%   { background-color: #ff00ff; } /* Magenta */
+  20%  { background-color: #00ffff; } /* Cyan */
+  40%  { background-color: #ffff00; } /* Yellow */
+  60%  { background-color: #00ff00; } /* Lime */
+  80%  { background-color: #ff8000; } /* Orange */
+  100% { background-color: #ff00ff; } /* Back to Magenta */
+}
+
+/* New animation for element borders */
+@keyframes disco-border-color {
+  0%   { border-color: rgba(255, 0, 128, 0.5); }
+  25%  { border-color: rgba(0, 255, 255, 0.5); }
+  50%  { border-color: rgba(255, 255, 0, 0.5); }
+  75%  { border-color: rgba(128, 0, 255, 0.5); }
+  100% { border-color: rgba(255, 0, 128, 0.5); }
 }
