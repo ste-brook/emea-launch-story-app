@@ -5,140 +5,145 @@ const auth = new google.auth.GoogleAuth({
   credentials: {
     client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
     private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-    project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
   },
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
 const sheets = google.sheets({ version: 'v4', auth });
 
-// Store the spreadsheet ID
-const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID;
+// Validate environment variables
+const validateEnvVars = () => {
+  const required = [
+    'GOOGLE_SHEETS_CLIENT_EMAIL',
+    'GOOGLE_SHEETS_PRIVATE_KEY',
+    'GOOGLE_SHEETS_PROJECT_ID',
+    'GOOGLE_SHEETS_ID',
+  ];
 
-// Headers for the Google Sheet
-export const HEADERS = [
-  'Launch Consultant',
-  'Merchant Name',
-  'Salesforce Case Link',
-  'Opportunity Revenue',
-  'Launch Status',
-  'D2C GMV',
-  'B2B GMV',
-  'POS Pro GMV',
-  'Enhanced Story',
-  'Submission Date'
-];
+  const missing = required.filter(key => !process.env[key]);
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+};
 
-// Get the sheet name to use
-export async function getSheetName(): Promise<string> {
+// Get sheet name
+export async function getSheetName() {
+  validateEnvVars();
+  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  
   try {
-    if (!SPREADSHEET_ID) {
-      throw new Error('Google Sheets ID is not configured');
-    }
-
-    // Get the spreadsheet metadata to find available sheets
-    const spreadsheet = await sheets.spreadsheets.get({
-      spreadsheetId: SPREADSHEET_ID,
+    const response = await sheets.spreadsheets.get({
+      spreadsheetId,
     });
-
-    const sheetsList = spreadsheet.data.sheets?.map(sheet => sheet.properties?.title).filter(Boolean) || [];
-    console.log('Available sheets:', sheetsList);
-
-    // Use the first sheet if 'Stories' doesn't exist
-    const sheetName = sheetsList.includes('Stories') ? 'Stories' : sheetsList[0];
-    if (!sheetName) {
+    
+    const sheetsList = response.data.sheets || [];
+    if (sheetsList.length === 0) {
       throw new Error('No sheets found in the spreadsheet');
     }
-    console.log('Using sheet:', sheetName);
     
-    return sheetName;
+    console.log('Available sheets:', sheetsList.map(sheet => sheet.properties?.title));
+    return sheetsList[0].properties?.title || 'Sheet1';
   } catch (error) {
     console.error('Error getting sheet name:', error);
     throw error;
   }
 }
 
-// Ensure headers exist in the sheet
-export async function ensureHeadersExist(sheetName: string): Promise<void> {
+// Ensure headers exist
+export async function ensureHeadersExist(sheetName: string) {
+  validateEnvVars();
+  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  
   try {
-    if (!SPREADSHEET_ID) {
-      throw new Error('Google Sheets ID is not configured');
-    }
-
-    console.log('Checking if headers exist in the sheet');
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${sheetName}!A1:J1`,
+      spreadsheetId,
+      range: `${sheetName}!A1:Z1`,
     });
-
-    if (!response.data.values || response.data.values.length === 0) {
-      console.log('Headers not found, creating them');
-      // Headers don't exist, create them
-      await sheets.spreadsheets.values.update({
-        spreadsheetId: SPREADSHEET_ID,
-        range: `${sheetName}!A1:J1`,
-        valueInputOption: 'USER_ENTERED',
-        requestBody: {
-          values: [HEADERS],
-        },
-      });
-      console.log('Headers created successfully');
-    } else {
-      console.log('Headers already exist in the sheet');
+    
+    const headers = response.data.values?.[0] || [];
+    if (headers.length === 0) {
+      throw new Error('No headers found in the sheet');
     }
+    
+    console.log('Headers found:', headers);
+    return headers;
   } catch (error) {
-    console.error('Error checking/creating headers:', error);
+    console.error('Error ensuring headers exist:', error);
     throw error;
   }
 }
 
-// Append data to the sheet
-export async function appendData(sheetName: string, values: any[][]): Promise<any> {
+// Append data to sheet
+export async function appendData(sheetName: string, data: any[]) {
+  validateEnvVars();
+  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  
   try {
-    if (!SPREADSHEET_ID) {
-      throw new Error('Google Sheets ID is not configured');
-    }
-
     console.log('Appending data to Google Sheet');
-    const appendResponse = await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${sheetName}!A:J`,
+    const response = await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: `${sheetName}!A:Z`,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
-        values,
+        values: [data],
       },
     });
-    console.log('Data appended successfully:', appendResponse.data);
-    return appendResponse.data;
+    
+    console.log('Data appended successfully:', response.data);
+    return response.data;
   } catch (error) {
     console.error('Error appending data:', error);
     throw error;
   }
 }
 
-// Get all data from the sheet
-export async function getAllData(sheetName: string): Promise<any[][]> {
+// Get all data from sheet
+export async function getAllData(sheetName: string) {
+  validateEnvVars();
+  const spreadsheetId = process.env.GOOGLE_SHEETS_ID;
+  
   try {
-    if (!SPREADSHEET_ID) {
-      throw new Error('Google Sheets ID is not configured');
-    }
-
-    // Get all data from the sheet
     const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: `${sheetName}!A:J`,
+      spreadsheetId,
+      range: `${sheetName}!A:Z`,
     });
-
-    if (!response.data.values || response.data.values.length <= 1) {
-      console.log('No data found in the sheet');
-      return [];
-    }
-
-    return response.data.values;
+    
+    return response.data.values || [];
   } catch (error) {
-    console.error('Error getting data:', error);
+    console.error('Error getting all data:', error);
     throw error;
   }
+}
+
+// Process data for leaderboard
+export function getLeaderboardData(data: any[]) {
+  if (!data || data.length < 2) return [];
+  
+  const headers = data[0];
+  const rows = data.slice(1);
+  
+  // Create a map to count submissions per consultant
+  const submissionsMap = new Map();
+  
+  rows.forEach(row => {
+    const consultantIndex = headers.indexOf('Launch Consultant');
+    if (consultantIndex !== -1 && row[consultantIndex]) {
+      const consultant = row[consultantIndex];
+      submissionsMap.set(consultant, (submissionsMap.get(consultant) || 0) + 1);
+    }
+  });
+  
+  // Convert map to array and sort by submissions
+  const leaderboardData = Array.from(submissionsMap.entries())
+    .map(([name, submissions], index) => ({
+      name,
+      submissions,
+      rank: index + 1,
+    }))
+    .sort((a, b) => b.submissions - a.submissions);
+  
+  console.log('Leaderboard data:', leaderboardData);
+  return leaderboardData;
 }
 
 // Format line of business data for Google Sheets
@@ -166,50 +171,4 @@ export function formatLineOfBusinessData(story: any): any[][] {
 
   console.log('Prepared data for Google Sheets:', values);
   return values;
-}
-
-// Get leaderboard data
-export function getLeaderboardData(data: any[][]): any[] {
-  if (!data || data.length <= 1) {
-    return [];
-  }
-
-  // Get the headers and clean them
-  const headers = data[0].map(header => 
-    typeof header === 'string' ? header.trim().replace(/\n/g, ' ') : ''
-  );
-  console.log('Headers found:', headers);
-
-  // Find the Launch Consultant column index
-  const consultantIndex = headers.findIndex(header => 
-    header.toLowerCase().includes('launch consultant')
-  );
-
-  if (consultantIndex === -1) {
-    console.error('Launch Consultant column not found');
-    return [];
-  }
-
-  // Count submissions by consultant
-  const consultantCounts: Record<string, number> = {};
-  
-  // Skip the header row
-  for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    if (row && row[consultantIndex]) {
-      const consultant = row[consultantIndex].trim();
-      if (consultant) {
-        consultantCounts[consultant] = (consultantCounts[consultant] || 0) + 1;
-      }
-    }
-  }
-
-  // Convert to array and sort by count
-  const leaderboardData = Object.entries(consultantCounts)
-    .map(([name, count]) => ({ name, submissions: count }))
-    .sort((a, b) => b.submissions - a.submissions)
-    .map((item, index) => ({ ...item, rank: index + 1 }));
-
-  console.log('Leaderboard data:', leaderboardData);
-  return leaderboardData;
 } 
