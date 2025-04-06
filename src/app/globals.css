@@ -358,3 +358,39 @@ textarea.p-input {
   75%  { border-color: rgba(128, 0, 255, 0.5); }
   100% { border-color: rgba(255, 0, 128, 0.5); }
 }
+
+@keyframes dance {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(15deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(-15deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes wiggle {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg) translateX(-2px);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(10deg) translateX(2px);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}

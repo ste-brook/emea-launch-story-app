@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Music } from 'lucide-react';
+import { User, UserRound } from 'lucide-react';
 
 interface DiscoModeProps {
   isActive: boolean;
@@ -18,7 +18,11 @@ export function DiscoMode({ isActive, onToggle }: DiscoModeProps) {
       title="Toggle Disco Mode"
       aria-label="Toggle Disco Mode"
     >
-      <Music className={`w-5 h-5 text-[var(--p-color-text)] ${isActive ? 'animate-spin' : ''}`} />
+      {isActive ? (
+        <UserRound className="w-5 h-5 text-[var(--p-color-text)] animate-[dance_1s_ease-in-out_infinite]" />
+      ) : (
+        <User className="w-5 h-5 text-[var(--p-color-text)] animate-[wiggle_2s_ease-in-out_infinite]" />
+      )}
     </button>
   );
 }
