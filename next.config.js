@@ -1,9 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   reactStrictMode: true,
   images: {
     unoptimized: true,
   },
+  basePath: process.env.NODE_ENV === 'production' ? '/emea-launch-story-app' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/emea-launch-story-app/' : '',
   async rewrites() {
     return [
       {
@@ -15,10 +18,6 @@ const nextConfig = {
   webpack: (config) => {
     return config;
   },
-  ...(process.env.NODE_ENV === 'production' ? {
-    basePath: '/launch-story-app',
-    assetPrefix: '/launch-story-app/',
-  } : {})
 }
 
 module.exports = nextConfig
