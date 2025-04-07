@@ -177,6 +177,10 @@ export function formatLineOfBusinessData(story: any): any[][] {
   const b2bGmv = story.lineOfBusiness?.includes('B2B') ? story.gmv.B2B : 'n/a';
   const posProGmv = story.lineOfBusiness?.includes('POS Pro') ? story.gmv['POS Pro'] : 'n/a';
   
+  // Format date as DD-MM-YYYY
+  const date = new Date();
+  const formattedDate = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+  
   return [
     [
       story.launchConsultant,
@@ -187,10 +191,8 @@ export function formatLineOfBusinessData(story: any): any[][] {
       d2cGmv,
       b2bGmv,
       posProGmv,
-      story.notes || '',
-      new Date().toISOString(),
       story.enhancedStory || '',
-      story.team || ''
+      formattedDate
     ],
   ];
 } 
