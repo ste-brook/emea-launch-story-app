@@ -149,7 +149,7 @@ export function getLeaderboardData(data: any[]) {
   const submissionsByConsultant = new Map<string, number>();
   
   data.forEach(row => {
-    const consultant = row[0]; // First column is Launch Consultant
+    const consultant = row[0]?.replace(/\s+/g, ' ').trim(); // Remove all extra whitespace and trim
     if (consultant) {
       submissionsByConsultant.set(
         consultant,
@@ -183,7 +183,7 @@ export function formatLineOfBusinessData(story: any): any[][] {
   
   return [
     [
-      story.launchConsultant,
+      story.launchConsultant?.replace(/\s+/g, ' ').trim() || '', // Remove all extra whitespace and trim
       story.merchantName,
       story.salesforceCaseLink,
       story.opportunityRevenue,
