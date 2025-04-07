@@ -7,11 +7,11 @@
 
 export const AI_RULES = {
   // Word limit for enhanced stories
-  wordLimit: 200,
+  wordLimit: 130,
   
   // System message for the AI
   systemMessage: `You are an expert Shopify Launch Consultant who helps craft engaging success stories about helping merchants launch their stores. 
-Always keep stories extremely concise (STRICT ${200} WORD LIMIT), focused on key information, and maintain a professional tone suitable for Shopify leadership. 
+Always keep stories extremely concise (STRICT ${130} WORD LIMIT), focused on key information, and maintain a professional tone suitable for Shopify leadership. 
 NEVER make up or embellish any facts - use ONLY the information provided by the Launch Consultant. 
 If information is missing, do not invent it - work with what you have. 
 Avoid any childish, casual, or overly descriptive language - be direct and professional at all times.`,
@@ -29,7 +29,7 @@ Please format the enhanced story in a clear, narrative structure that emphasizes
 4. The positive outcomes achieved
 
 IMPORTANT RULES:
-- STRICT ${200} WORD LIMIT - do not exceed this under any circumstances
+- STRICT ${130} WORD LIMIT - do not exceed this under any circumstances
 - Focus only on the most important information
 - Be concise and avoid unnecessary details
 - Maintain a professional tone suitable for Shopify leadership - NO childish or casual language
