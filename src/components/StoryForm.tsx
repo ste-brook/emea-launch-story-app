@@ -44,11 +44,23 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   const [isEnhancedStoryTransitioning, setIsEnhancedStoryTransitioning] = useState(false);
 
   const handleLineOfBusinessChange = (business: string, checked: boolean) => {
+    const newLineOfBusiness = checked
+      ? [...(story.lineOfBusiness || []), business as BusinessType]
+      : (story.lineOfBusiness || []).filter((b: BusinessType) => b !== business as BusinessType);
+    
+    const newGmv = { ...story.gmv };
+    if (checked) {
+      // Initialize GMV for newly selected business
+      newGmv[business as BusinessType] = '';
+    } else {
+      // Remove GMV for unselected business
+      delete newGmv[business as BusinessType];
+    }
+    
     setStory({
       ...story,
-      lineOfBusiness: checked
-        ? [...(story.lineOfBusiness || []), business as BusinessType]
-        : (story.lineOfBusiness || []).filter((b: BusinessType) => b !== business as BusinessType),
+      lineOfBusiness: newLineOfBusiness,
+      gmv: newGmv
     });
   };
 

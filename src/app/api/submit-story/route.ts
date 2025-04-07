@@ -5,6 +5,7 @@ import {
   appendData, 
   formatLineOfBusinessData 
 } from '@/lib/googleSheets';
+import type { BusinessType } from '@/components/StoryForm';
 
 export async function POST(request: Request) {
   try {
@@ -12,10 +13,24 @@ export async function POST(request: Request) {
     const story = await request.json();
     console.log('Story data:', JSON.stringify(story, null, 2));
 
-    if (!story.merchantName) {
-      console.log('Error: Merchant name is missing');
+    // Validate required fields
+    const requiredFields = ['merchantName', 'launchConsultant', 'salesforceCaseLink', 'launchStatus', 'lineOfBusiness'];
+    const missingFields = requiredFields.filter(field => !story[field]);
+    
+    if (missingFields.length > 0) {
+      console.log('Error: Missing required fields:', missingFields);
       return NextResponse.json(
-        { error: 'Merchant name is required' },
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Validate GMV for selected lines of business
+    const missingGmv = story.lineOfBusiness.filter((business: BusinessType) => !story.gmv[business]);
+    if (missingGmv.length > 0) {
+      console.log('Error: Missing GMV for:', missingGmv);
+      return NextResponse.json(
+        { error: `Missing GMV for: ${missingGmv.join(', ')}` },
         { status: 400 }
       );
     }
@@ -29,12 +44,15 @@ export async function POST(request: Request) {
 
     // Get the sheet name
     const sheetName = await getSheetName();
+    console.log('Using sheet:', sheetName);
     
     // Ensure headers exist
-    await ensureHeadersExist(sheetName);
+    const headers = await ensureHeadersExist(sheetName);
+    console.log('Headers found:', headers);
     
     // Format the data for Google Sheets
     const values = formatLineOfBusinessData(story);
+    console.log('Formatted data:', values);
     
     // Append the data to the sheet
     await appendData(sheetName, values);
@@ -43,7 +61,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error submitting story:', error);
     return NextResponse.json(
-      { error: 'Failed to submit story' },
+      { error: error instanceof Error ? error.message : 'Failed to submit story' },
       { status: 500 }
     );
   }
