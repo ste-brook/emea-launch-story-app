@@ -10,39 +10,55 @@ export const AI_RULES = {
   wordLimit: 130,
   
   // System message for the AI
-  systemMessage: `You are an expert Shopify Launch Consultant who helps craft engaging success stories about helping merchants launch their stores. 
-Always keep stories extremely concise (STRICT ${130} WORD LIMIT), focused on key information, and maintain a professional tone suitable for Shopify leadership. 
-NEVER make up or embellish any facts - use ONLY the information provided by the Launch Consultant. 
-If information is missing, do not invent it - work with what you have. 
-Avoid any childish, casual, or overly descriptive language - be direct and professional at all times.`,
+  systemMessage: `You are an expert Shopify Launch Consultant who crafts success stories about merchant launches.
+Your role is to transform launch notes into consistently structured, professional stories.
+You must STRICTLY follow the provided format and rules without deviation.
+Never exceed the ${130} word limit.
+Never make up or embellish facts - use ONLY the provided information.
+If information for any section is missing, write "No information provided" for that section.`,
   
   // Prompt template for the AI
-  promptTemplate: (merchantName: string, notes: string) => `As a Shopify Launch Consultant, please enhance the following story about helping a merchant launch their store. Make it engaging, professional, and highlight the key challenges and solutions. Include specific details and outcomes where possible.
+  promptTemplate: (merchantName: string, notes: string) => `Transform these launch notes into a structured success story following this EXACT format:
 
-Merchant Name: ${merchantName}
-Original Notes: ${notes}
+MERCHANT: ${merchantName}
+ORIGINAL NOTES: ${notes}
 
-Please format the enhanced story in a clear, narrative structure that emphasizes:
-1. The initial challenge or situation
-2. The actions taken to address it
-3. The specific solutions implemented
-4. The positive outcomes achieved
+Your response must follow this EXACT structure with these EXACT headings:
 
-IMPORTANT RULES:
-- STRICT ${130} WORD LIMIT - do not exceed this under any circumstances
-- Focus only on the most important information
-- Be concise and avoid unnecessary details
-- Maintain a professional tone suitable for Shopify leadership - NO childish or casual language
-- NEVER make up or embellish any facts - use ONLY the information provided by the Launch Consultant
-- If information is missing, do not invent it - work with what you have
-- Avoid any fluff or overly descriptive language - be direct and professional
+CHALLENGE:
+[1-2 sentences describing the main challenge or goal the merchant faced]
 
-Make the story engaging while maintaining a professional tone suitable for executive review.`,
+SOLUTION:
+[1-2 sentences explaining what specific Shopify solutions or features were implemented]
+
+OUTCOME:
+[1-2 sentences highlighting quantifiable results, improvements, or positive impact]
+
+STRICT FORMATTING RULES:
+1. Use EXACTLY the headings shown above: CHALLENGE, SOLUTION, OUTCOME
+2. Each section must be 1-2 sentences only
+3. Total word count must not exceed ${130} words
+4. Use clear, professional language - no marketing fluff
+5. Include specific details and numbers when available
+6. Start each section with an action verb when possible
+7. Write in third person perspective
+8. Use past tense consistently
+
+TONE REQUIREMENTS:
+- Professional and direct
+- Factual and specific
+- No superlatives or exaggeration
+- No casual or conversational language
+- No adjectives unless describing measurable qualities
+
+If any section lacks information, write "No information provided" for that section.
+
+Format your response exactly as shown above, with clear headings and sections.`,
   
   // Model configuration
   modelConfig: {
     model: "gpt-4-turbo-preview",
-    temperature: 0.7,
+    temperature: 0.3, // Reduced for more consistent output
     max_tokens: 1000,
   }
 }; 
