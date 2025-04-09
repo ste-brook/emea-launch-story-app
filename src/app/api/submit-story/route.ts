@@ -5,6 +5,8 @@ import {
   appendData, 
   formatLineOfBusinessData 
 } from '@/lib/googleSheets';
+import { createLaunchStoryDoc } from '@/lib/googleDocs';
+import { sendSlackNotification } from '@/lib/slack';
 import type { BusinessType } from '@/components/StoryForm';
 
 export async function POST(request: Request) {
@@ -57,7 +59,34 @@ export async function POST(request: Request) {
     // Append the data to the sheet
     await appendData(sheetName, values);
 
-    return NextResponse.json({ success: true });
+    // Create a Google Doc for the story
+    console.log('Creating Google Doc for the story...');
+    let docUrl;
+    try {
+      docUrl = await createLaunchStoryDoc(story);
+      console.log('Google Doc created successfully:', docUrl);
+    } catch (docError) {
+      console.error('Error creating Google Doc:', docError);
+      // Don't fail the whole submission if doc creation fails
+      docUrl = null;
+    }
+
+    // Send Slack notification
+    console.log('Sending Slack notification...');
+    try {
+      await sendSlackNotification({
+        ...story,
+        docUrl: docUrl
+      });
+    } catch (slackError) {
+      console.error('Error sending Slack notification:', slackError);
+      // Don't fail the submission if Slack notification fails
+    }
+
+    return NextResponse.json({ 
+      success: true,
+      docUrl: docUrl || null
+    });
   } catch (error) {
     console.error('Error submitting story:', error);
     return NextResponse.json(

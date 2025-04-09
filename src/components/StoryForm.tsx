@@ -5,30 +5,30 @@ import { Sparkles } from './Sparkles';
 import { Celebration } from './Celebration';
 import SparklyButton from './SparklyButton';
 
-export type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
+type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
 
-export interface Story {
+interface Story {
   merchantName: string;
-  notes: string;
-  enhancedStory: string;
   launchConsultant: string;
-  team: string;
   salesforceCaseLink: string;
-  lineOfBusiness: BusinessType[];
-  gmv: {
-    D2C?: string;
-    B2B?: string;
-    'POS Pro'?: string;
-  };
+  opportunityRevenue: string;
   launchStatus: string;
   launchDate: string;
-  opportunityRevenue: string;
+  lineOfBusiness: BusinessType[];
+  gmv: Partial<Record<BusinessType, string>>;
+  notes: string;
+  enhancedStory: string;
+  team: string;
 }
 
 interface StoryFormProps {
   story: Story;
   setStory: (story: Story) => void;
 }
+
+type GmvType = Partial<Record<BusinessType, string>>;
+type GmvFieldErrorKey = `gmv_${BusinessType}`;
+type FieldErrorsType = Partial<Record<GmvFieldErrorKey | string, string>>;
 
 export function StoryForm({ story, setStory }: StoryFormProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
@@ -38,10 +38,26 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   const [showCelebration, setShowCelebration] = useState(false);
   const [additionalPrompt, setAdditionalPrompt] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrorsType>({});
   const [isEnhancedStoryVisible, setIsEnhancedStoryVisible] = useState(false);
   const [isEnhancedStoryEditable, setIsEnhancedStoryEditable] = useState(false);
   const [isEnhancedStoryTransitioning, setIsEnhancedStoryTransitioning] = useState(false);
+  const [formattedGmv, setFormattedGmv] = useState<Record<BusinessType, string>>({} as Record<BusinessType, string>);
+
+  // Format GMV value to include commas for thousands
+  const formatGmvValue = (value: string): string => {
+    // Remove any non-numeric characters except commas
+    const cleanValue = value.replace(/[^0-9,]/g, '');
+    // Remove all commas and then add them back in the correct positions
+    const number = cleanValue.replace(/,/g, '');
+    if (!number) return '';
+    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  // Parse GMV value for calculations (removes commas)
+  const parseGmvValue = (value: string): number => {
+    return parseInt(value.replace(/,/g, ''), 10) || 0;
+  };
 
   const handleLineOfBusinessChange = (business: string, checked: boolean) => {
     const newLineOfBusiness = checked
@@ -65,13 +81,31 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   };
 
   const handleGmvChange = (business: BusinessType, value: string) => {
-    setStory({
-      ...story,
-      gmv: {
-        ...story.gmv,
-        [business]: value
-      }
-    });
+    const formattedValue = formatGmvValue(value);
+    const newGmv: GmvType = { ...story.gmv };
+    newGmv[business] = formattedValue;
+    setStory({ ...story, gmv: newGmv });
+
+    // Clear any existing error for this field
+    const errorKey = `gmv_${business}`;
+    const updatedErrors = { ...fieldErrors };
+    if (errorKey in updatedErrors) {
+      delete updatedErrors[errorKey];
+      setFieldErrors(updatedErrors);
+    }
+  };
+
+  const validateGmv = (business: BusinessType): boolean => {
+    const gmvValue = story.gmv[business];
+    if (!gmvValue || gmvValue.trim() === '') {
+      const errorKey = `gmv_${business}`;
+      setFieldErrors(prev => ({
+        ...prev,
+        [errorKey]: `Please enter the GMV for ${business}`
+      }));
+      return false;
+    }
+    return true;
   };
 
   const handleLaunchStatusChange = (status: string) => {
@@ -110,8 +144,19 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
     // Validate GMV for each selected business type
     story.lineOfBusiness.forEach((business: BusinessType) => {
-      if (!story.gmv[business]) {
+      const gmvValue = story.gmv[business];
+      if (!gmvValue) {
         errors[`gmv_${business}`] = `GMV for ${business} is required`;
+      } else {
+        // Check if the GMV value contains only numbers and commas
+        if (!/^[0-9,]+$/.test(gmvValue)) {
+          errors[`gmv_${business}`] = `GMV for ${business} should only contain numbers`;
+        }
+        // Check if the value is too large (prevent integer overflow)
+        const numericValue = parseGmvValue(gmvValue);
+        if (numericValue > Number.MAX_SAFE_INTEGER) {
+          errors[`gmv_${business}`] = `GMV value is too large`;
+        }
       }
     });
     
@@ -385,16 +430,26 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                     
                     {story.lineOfBusiness?.includes(business as BusinessType) && (
                       <div className="flex-1">
-                        <input
-                          type="text"
-                          id={`gmv_${business.toLowerCase()}`}
-                          value={story.gmv[business as BusinessType] || ''}
-                          onChange={(e) => handleGmvChange(business as BusinessType, e.target.value)}
-                          className="p-input w-full py-1 text-sm"
-                          placeholder={business === 'POS Pro' ? 'Retail GMV' : `${business} GMV`}
-                        />
+                        <div className="relative flex items-center">
+                          <input
+                            type="text"
+                            id={`gmv-${business}`}
+                            value={story.gmv[business as BusinessType] || ''}
+                            onChange={(e) => handleGmvChange(business as BusinessType, e.target.value)}
+                            className={`p-input w-4/5 py-2 ${
+                              fieldErrors[`gmv_${business}`] ? 'border-red-500' : ''
+                            }`}
+                            placeholder={business === 'POS Pro' ? 'Retail GMV' : `${business} GMV`}
+                          />
+                          <div className="relative ml-2 group">
+                            <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">ⓘ</span>
+                            <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
+                              Copy and paste the GMV value from the merchant's opportunity.
+                            </div>
+                          </div>
+                        </div>
                         {fieldErrors[`gmv_${business}`] && (
-                          <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors[`gmv_${business}`]}</p>
+                          <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors[`gmv_${business}`]}</p>
                         )}
                       </div>
                     )}
