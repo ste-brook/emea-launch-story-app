@@ -5,7 +5,7 @@ import { Sparkles } from './Sparkles';
 import { Celebration } from './Celebration';
 import SparklyButton from './SparklyButton';
 
-type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
+export type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
 
 interface Story {
   merchantName: string;
@@ -43,6 +43,19 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   const [isEnhancedStoryEditable, setIsEnhancedStoryEditable] = useState(false);
   const [isEnhancedStoryTransitioning, setIsEnhancedStoryTransitioning] = useState(false);
   const [formattedGmv, setFormattedGmv] = useState<Record<BusinessType, string>>({} as Record<BusinessType, string>);
+
+  const getGmvTooltip = (business: BusinessType) => {
+    switch(business) {
+      case 'D2C':
+        return 'D2C GMV values can be found in Opportunity > Revenue Detail > Opp D2C Revenue Verified';
+      case 'B2B':
+        return 'B2B GMV values can be found in Opportunity > Revenue Detail > Opp B2B Revenue Verified';
+      case 'POS Pro':
+        return 'Retail GMV values can be found in Opportunity > Revenue Detail > Opp Retail Revenue Verified';
+      default:
+        return '';
+    }
+  };
 
   // Format GMV value to include commas for thousands
   const formatGmvValue = (value: string): string => {
@@ -148,9 +161,9 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       if (!gmvValue) {
         errors[`gmv_${business}`] = `GMV for ${business} is required`;
       } else {
-        // Check if the GMV value contains only numbers and commas
-        if (!/^[0-9,]+$/.test(gmvValue)) {
-          errors[`gmv_${business}`] = `GMV for ${business} should only contain numbers`;
+        // Check if the GMV value contains only numbers and properly formatted commas
+        if (!/^\d{1,3}(,\d{3})*$/.test(gmvValue)) {
+          errors[`gmv_${business}`] = `GMV for ${business} should be a number with optional thousands separators (e.g., 1,000,000)`;
         }
         // Check if the value is too large (prevent integer overflow)
         const numericValue = parseGmvValue(gmvValue);
@@ -368,14 +381,22 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               <label htmlFor="opportunityRevenue" className="block p-text font-medium mb-2 text-sm">
                 Opportunity Revenue
               </label>
-              <input
-                type="text"
-                id="opportunityRevenue"
-                value={story.opportunityRevenue}
-                onChange={(e) => setStory({ ...story, opportunityRevenue: e.target.value })}
-                className="p-input w-full py-2"
-                placeholder="Enter opportunity revenue"
-              />
+              <div className="relative flex items-center">
+                <input
+                  type="text"
+                  id="opportunityRevenue"
+                  value={story.opportunityRevenue}
+                  onChange={(e) => setStory({ ...story, opportunityRevenue: e.target.value })}
+                  className="p-input w-full py-2"
+                  placeholder="Enter opportunity revenue"
+                />
+                <div className="relative ml-2 group">
+                  <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">ⓘ</span>
+                  <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
+                    Opportunity Revenue can be found in Opportunity > Revenue Detail > Total Revenue
+                  </div>
+                </div>
+              </div>
               {fieldErrors.opportunityRevenue && (
                 <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.opportunityRevenue}</p>
               )}
@@ -444,7 +465,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                           <div className="relative ml-2 group">
                             <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">ⓘ</span>
                             <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
-                              Copy and paste the GMV value from the merchant's opportunity.
+                              {getGmvTooltip(business as BusinessType)}
                             </div>
                           </div>
                         </div>

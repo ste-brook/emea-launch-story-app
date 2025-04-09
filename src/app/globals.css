@@ -123,6 +123,7 @@ textarea.p-input {
   -moz-appearance: none;
   width: 18px;
   height: 18px;
+  padding: 0;
   border: 2px solid var(--p-color-border-subdued);
   border-radius: 3px;
   background-color: var(--p-color-bg-surface-secondary);
@@ -130,6 +131,10 @@ textarea.p-input {
   position: relative;
   margin-right: 8px;
   transition: all 0.2s ease;
+  min-width: 18px;
+  min-height: 18px;
+  max-width: 18px;
+  max-height: 18px;
 }
 
 .p-input[type="checkbox"]:hover {
@@ -138,14 +143,14 @@ textarea.p-input {
 
 .p-input[type="checkbox"]:checked {
   background-color: var(--p-color-bg-primary);
-  border-color: var(--p-color-border-focused);
+  border-color: var(--p-color-bg-primary);
 }
 
 .p-input[type="checkbox"]:checked::after {
   content: '';
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 45%;
   width: 6px;
   height: 10px;
   border: solid white;
