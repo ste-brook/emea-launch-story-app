@@ -4,6 +4,7 @@ import React from 'react';
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
+import DiscoButton from "@/components/DiscoButton";
 import Image from 'next/image'
 
 const inter = Inter({ subsets: ["latin"] });
@@ -32,6 +33,7 @@ export default function RootLayout({
                 </h1>
               </div>
               <div className="flex items-center space-x-2">
+                <DiscoButton />
                 <ThemeToggle />
               </div>
             </div>

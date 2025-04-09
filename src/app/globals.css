@@ -240,3 +240,110 @@ textarea.p-input {
   outline: none;
   box-shadow: 0 0 0 2px var(--p-color-bg-primary), 0 0 0 4px var(--p-color-border-focused);
 }
+
+/* Disco mode animations */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes disco-pulse {
+  0% {
+    border-color: #004C3F;
+  }
+  33% {
+    border-color: #5c6ac4;
+  }
+  66% {
+    border-color: #95BF47;
+  }
+  100% {
+    border-color: #004C3F;
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Disco mode styles */
+.disco-mode .p-card {
+  transition: all 0.5s ease;
+  border: 2px solid transparent;
+  animation: disco-pulse 3s infinite;
+  background: linear-gradient(
+    var(--p-color-bg-surface),
+    var(--p-color-bg-surface)
+  ) padding-box,
+  linear-gradient(
+    45deg,
+    #004C3F,
+    #5c6ac4,
+    #95BF47
+  ) border-box;
+}
+
+.disco-mode .p-button {
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.disco-mode .p-button:hover {
+  transform: scale(1.05) translateZ(10px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.disco-mode header {
+  position: relative;
+  overflow: hidden;
+}
+
+.disco-mode header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(0, 76, 63, 0.1),  /* Shopify green */
+    rgba(92, 106, 196, 0.1),  /* Shopify purple */
+    rgba(149, 191, 71, 0.1)   /* Shopify light green */
+  );
+  animation: disco-pulse 3s infinite;
+  pointer-events: none;
+}
+
+.disco-active {
+  position: relative;
+}
+
+.disco-active::after {
+  content: '✨';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 12px;
+  animation: sparkle 1.5s infinite;
+}
