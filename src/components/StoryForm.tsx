@@ -5,6 +5,25 @@ import { Sparkles } from './Sparkles';
 import { Celebration } from './Celebration';
 import SparklyButton from './SparklyButton';
 
+const LAUNCH_CONSULTANTS = [
+  'Allesandro Baglivo',
+  'Alica Diana',
+  'Ania Kowalska',
+  'Astrid Balza',
+  'Frankie Lodge',
+  'Jack Rapley',
+  'Khalid Chao',
+  'Leslie Ludwig',
+  'Lou Dennehy',
+  'Niklas Hermsdorf',
+  'Sam Zeender',
+  'Sandra Conway',
+  'Sascha Engel',
+  'Stephen Brook',
+  'Tadib Muqtada',
+  'Valeria Honta'
+].sort();
+
 export type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
 
 interface Story {
@@ -328,14 +347,26 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               <label htmlFor="launchConsultant" className="block p-text font-medium mb-2 text-sm">
                 Launch Consultant
               </label>
-              <input
-                type="text"
-                id="launchConsultant"
-                value={story.launchConsultant}
-                onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
-                className="p-input w-full py-2"
-                placeholder="Enter your name"
-              />
+              <div className="relative">
+                <select
+                  id="launchConsultant"
+                  value={story.launchConsultant}
+                  onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
+                  className="p-input w-full py-2 appearance-none bg-white pr-8"
+                >
+                  <option value="">Select consultant</option>
+                  {LAUNCH_CONSULTANTS.map((consultant) => (
+                    <option key={consultant} value={consultant}>
+                      {consultant}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                  </svg>
+                </div>
+              </div>
               {fieldErrors.launchConsultant && (
                 <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.launchConsultant}</p>
               )}
@@ -391,9 +422,9 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                   placeholder="Enter opportunity revenue"
                 />
                 <div className="relative ml-2 group">
-                  <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">ⓘ</span>
+                  <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">{'ⓘ'}</span>
                   <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
-                    Opportunity Revenue can be found in Opportunity > Revenue Detail > Total Revenue
+                    Opportunity Revenue can be found in Opportunity {'>'} Revenue Detail {'>'} Total Revenue
                   </div>
                 </div>
               </div>
@@ -463,7 +494,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                             placeholder={business === 'POS Pro' ? 'Retail GMV' : `${business} GMV`}
                           />
                           <div className="relative ml-2 group">
-                            <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">ⓘ</span>
+                            <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">{'ⓘ'}</span>
                             <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
                               {getGmvTooltip(business as BusinessType)}
                             </div>

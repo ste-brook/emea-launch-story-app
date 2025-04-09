@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     // Validate GMV format
     const gmvFormatError = story.lineOfBusiness.find((business: BusinessType) => {
       const gmvValue = story.gmv[business];
-      return !/^\d{1,3}(,\d{3})*$/.test(gmvValue);
+      return !/^\d+(?:,\d{3})*$/.test(gmvValue);
     });
 
     if (gmvFormatError) {
