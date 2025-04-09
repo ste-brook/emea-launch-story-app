@@ -241,104 +241,148 @@ textarea.p-input {
   box-shadow: 0 0 0 2px var(--p-color-bg-primary), 0 0 0 4px var(--p-color-border-focused);
 }
 
-/* Disco mode animations */
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
+/* Enhanced Disco mode animations */
+@keyframes disco-pulse {
+  0% {
+    background-position: 0% 50%;
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-@keyframes disco-pulse {
-  0% {
-    border-color: #004C3F;
-  }
-  33% {
-    border-color: #5c6ac4;
-  }
-  66% {
-    border-color: #95BF47;
-  }
-  100% {
-    border-color: #004C3F;
-  }
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
 }
 
 @keyframes sparkle {
   0% {
     opacity: 0;
-    transform: scale(0);
+    transform: scale(0) rotate(0deg);
   }
   50% {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) rotate(180deg);
   }
   100% {
     opacity: 0;
-    transform: scale(0);
+    transform: scale(0) rotate(360deg);
   }
 }
 
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Disco mode styles */
+/* Base disco mode styles */
+.disco-mode {
+  background: linear-gradient(-45deg, 
+    rgba(0, 76, 63, 0.05),
+    rgba(92, 106, 196, 0.05),
+    rgba(149, 191, 71, 0.05),
+    rgba(0, 76, 63, 0.05)
+  );
+  background-size: 400% 400%;
+  animation: disco-pulse 15s ease infinite;
+}
+
+/* Card styles */
 .disco-mode .p-card {
   transition: all 0.5s ease;
+  background: linear-gradient(-45deg,
+    rgba(0, 76, 63, 0.1),
+    rgba(92, 106, 196, 0.1),
+    rgba(149, 191, 71, 0.1)
+  ) !important;
+  background-size: 200% 200% !important;
+  animation: disco-pulse 6s ease infinite;
   border: 2px solid transparent;
-  animation: disco-pulse 3s infinite;
-  background: linear-gradient(
-    var(--p-color-bg-surface),
-    var(--p-color-bg-surface)
-  ) padding-box,
-  linear-gradient(
-    45deg,
-    #004C3F,
-    #5c6ac4,
-    #95BF47
-  ) border-box;
-}
-
-.disco-mode .p-button {
-  transition: all 0.3s ease;
+  background-clip: padding-box;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  backdrop-filter: blur(4px);
   transform-style: preserve-3d;
   perspective: 1000px;
 }
 
+.disco-mode .p-card:hover {
+  transform: translateY(-5px) rotateX(5deg);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  border-image: linear-gradient(45deg, #004C3F, #5c6ac4, #95BF47) 1;
+}
+
+/* Button styles */
+.disco-mode .p-button {
+  background: linear-gradient(-45deg, #004C3F, #5c6ac4, #95BF47) !important;
+  background-size: 200% 200% !important;
+  animation: disco-pulse 6s ease infinite;
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
 .disco-mode .p-button:hover {
-  transform: scale(1.05) translateZ(10px);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.1);
 }
 
+/* Header styles */
 .disco-mode header {
-  position: relative;
-  overflow: hidden;
+  background: linear-gradient(-45deg,
+    rgba(0, 76, 63, 0.98),
+    rgba(92, 106, 196, 0.98),
+    rgba(149, 191, 71, 0.98)
+  ) !important;
+  background-size: 200% 200% !important;
+  animation: disco-pulse 6s ease infinite;
+  border-bottom: none !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-.disco-mode header::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    45deg,
-    rgba(0, 76, 63, 0.1),  /* Shopify green */
-    rgba(92, 106, 196, 0.1),  /* Shopify purple */
-    rgba(149, 191, 71, 0.1)   /* Shopify light green */
-  );
-  animation: disco-pulse 3s infinite;
-  pointer-events: none;
+/* Text styles */
+.disco-mode h1,
+.disco-mode h2,
+.disco-mode h3 {
+  background: linear-gradient(-45deg, #004C3F, #5c6ac4, #95BF47);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+  animation: disco-pulse 6s ease infinite;
 }
 
-.disco-active {
-  position: relative;
+/* Form input styles */
+.disco-mode input,
+.disco-mode select,
+.disco-mode textarea {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--p-color-bg-surface), var(--p-color-bg-surface)) padding-box,
+              linear-gradient(45deg, #004C3F, #5c6ac4, #95BF47) border-box !important;
+  transition: all 0.3s ease;
 }
 
+.disco-mode input:focus,
+.disco-mode select:focus,
+.disco-mode textarea:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Leaderboard enhancements */
+.disco-mode .w-6.h-6.flex-shrink-0.rounded-full {
+  animation: float 3s ease-in-out infinite;
+  background: linear-gradient(-45deg, #004C3F, #5c6ac4, #95BF47) !important;
+  background-size: 200% 200% !important;
+  animation: disco-pulse 6s ease infinite;
+}
+
+/* Sparkle effect */
 .disco-active::after {
   content: '✨';
   position: absolute;
@@ -346,4 +390,10 @@ textarea.p-input {
   right: -5px;
   font-size: 12px;
   animation: sparkle 1.5s infinite;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+}
+
+/* Animate spin for disco ball */
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
 }
