@@ -1,7 +1,14 @@
 import { google } from 'googleapis';
 import { getGoogleAuthClient } from './googleSheets';
 
-const FOLDER_ID = '1VcCUB0NCINhYXtbMhDSmexP2IrMNtyOa';
+const FOLDER_ID = process.env.GOOGLE_DRIVE_FOLDER_ID;
+
+// Validate environment variables
+const validateEnvVars = () => {
+  if (!FOLDER_ID) {
+    throw new Error('Missing required environment variable: GOOGLE_DRIVE_FOLDER_ID');
+  }
+};
 
 export interface LaunchStoryDoc {
   merchantName: string;
@@ -22,9 +29,22 @@ export interface LaunchStoryDoc {
 
 export async function createLaunchStoryDoc(storyData: LaunchStoryDoc): Promise<string> {
   try {
+    validateEnvVars();
     const auth = await getGoogleAuthClient();
     const docs = google.docs({ version: 'v1', auth });
     const drive = google.drive({ version: 'v3', auth });
+
+    // First verify the folder exists and is accessible
+    try {
+      const folder = await drive.files.get({
+        fileId: FOLDER_ID,
+        fields: 'id, name'
+      });
+      console.log('Found Google Drive folder:', folder.data.name);
+    } catch (error) {
+      console.error('Error accessing Google Drive folder:', error);
+      throw new Error('Could not access the Google Drive folder. Please verify the folder ID and permissions.');
+    }
 
     // Create a new Google Doc
     const createResponse = await docs.documents.create({

@@ -37,6 +37,20 @@ export async function POST(request: Request) {
       );
     }
 
+    // Validate GMV format
+    const gmvFormatError = story.lineOfBusiness.find((business: BusinessType) => {
+      const gmvValue = story.gmv[business];
+      return !/^\d{1,3}(,\d{3})*$/.test(gmvValue);
+    });
+
+    if (gmvFormatError) {
+      console.log('Error: Invalid GMV format for:', gmvFormatError);
+      return NextResponse.json(
+        { error: `Invalid GMV format for ${gmvFormatError}. Please use numbers with optional thousands separators (e.g., 1,000,000)` },
+        { status: 400 }
+      );
+    }
+
     console.log('Google Sheets credentials:', {
       client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
       project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
