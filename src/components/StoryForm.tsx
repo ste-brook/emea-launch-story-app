@@ -26,7 +26,7 @@ const LAUNCH_CONSULTANTS = [
 
 export type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
 
-interface Story {
+export interface Story {
   merchantName: string;
   launchConsultant: string;
   salesforceCaseLink: string;
@@ -145,6 +145,18 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       ...story,
       launchStatus: status,
     });
+  };
+
+  const handleOpportunityRevenueChange = (value: string) => {
+    const formattedValue = formatGmvValue(value);
+    setStory({ ...story, opportunityRevenue: formattedValue });
+
+    // Clear any existing error for this field
+    const updatedErrors = { ...fieldErrors };
+    if ('opportunityRevenue' in updatedErrors) {
+      delete updatedErrors['opportunityRevenue'];
+      setFieldErrors(updatedErrors);
+    }
   };
 
   const validateFields = () => {
@@ -414,12 +426,12 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               </label>
               <div className="relative flex items-center">
                 <input
-                  type="text"
                   id="opportunityRevenue"
+                  type="text"
                   value={story.opportunityRevenue}
-                  onChange={(e) => setStory({ ...story, opportunityRevenue: e.target.value })}
+                  onChange={(e) => handleOpportunityRevenueChange(e.target.value)}
                   className="p-input w-full py-2"
-                  placeholder="Enter opportunity revenue"
+                  placeholder="e.g., 1,000,000"
                 />
                 <div className="relative ml-2 group">
                   <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">{'ⓘ'}</span>
@@ -488,10 +500,10 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                             id={`gmv-${business}`}
                             value={story.gmv[business as BusinessType] || ''}
                             onChange={(e) => handleGmvChange(business as BusinessType, e.target.value)}
-                            className={`p-input w-4/5 py-2 ${
+                            className={`p-input w-full py-2 ${
                               fieldErrors[`gmv_${business}`] ? 'border-red-500' : ''
                             }`}
-                            placeholder={business === 'POS Pro' ? 'Retail GMV' : `${business} GMV`}
+                            placeholder={`${business} GMV`}
                           />
                           <div className="relative ml-2 group">
                             <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">{'ⓘ'}</span>

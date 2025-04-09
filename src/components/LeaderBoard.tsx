@@ -116,10 +116,6 @@ export function LeaderBoard({ currentConsultant }: LeaderBoardProps) {
           ))}
         </div>
       )}
-      
-      <div className="mt-[var(--p-space-4)] text-center text-xs text-[var(--p-color-text-subdued)]">
-        Share your story and join the leaderboard!
-      </div>
     </div>
   );
 } 

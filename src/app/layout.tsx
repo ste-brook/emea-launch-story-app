@@ -33,8 +33,8 @@ export default function RootLayout({
                 </h1>
               </div>
               <div className="flex items-center space-x-2">
-                <DiscoButton />
                 <ThemeToggle />
+                <DiscoButton />
               </div>
             </div>
           </div>

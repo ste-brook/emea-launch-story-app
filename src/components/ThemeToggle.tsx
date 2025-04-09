@@ -27,7 +27,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-[var(--p-border-radius-base)] bg-[var(--p-color-bg-surface-secondary)]"
+      className="theme-toggle p-2 rounded-[var(--p-border-radius-base)] bg-[var(--p-color-bg-surface-secondary)]"
       aria-label="Toggle theme"
     >
       {isDarkMode ? (
