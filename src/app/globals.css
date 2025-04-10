@@ -255,9 +255,9 @@ textarea.p-input {
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(5px); }
+  100% { transform: translateX(0px); }
 }
 
 @keyframes sparkle {
@@ -363,8 +363,8 @@ textarea.p-input {
 }
 
 @keyframes rhythm-pulse {
-  0%, 100% { transform: scale(1); filter: brightness(1); }
-  50% { transform: scale(1.02); filter: brightness(1.2); }
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
 }
 
 @keyframes neon-flicker {
@@ -537,7 +537,6 @@ textarea.p-input {
   background: rgba(0, 0, 0, 0.9) !important;
   border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  animation: rhythm-pulse 2s ease-in-out infinite;
   position: sticky !important;
   top: 0 !important;
   z-index: 100 !important;
@@ -545,8 +544,24 @@ textarea.p-input {
   box-shadow: 
     0 5px 20px rgba(255, 0, 255, 0.2),
     0 2px 10px rgba(0, 255, 255, 0.1);
+  overflow: hidden;
 }
 
+/* Add pulsing effect to header content */
+.disco-mode header > div {
+  position: relative;
+  animation: float 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+/* Update float animation to move side to side */
+@keyframes float {
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(5px); }
+  100% { transform: translateX(0px); }
+}
+
+/* Rainbow border effect */
 .disco-mode header::after {
   content: '';
   position: absolute;
@@ -565,31 +580,7 @@ textarea.p-input {
   animation: disco-shimmer 3s linear infinite;
 }
 
-/* Add ballerina spin animation */
-@keyframes ballerina-spin {
-  0% { 
-    transform: rotateY(0deg) translateY(0px);
-    filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-  }
-  25% {
-    transform: rotateY(90deg) translateY(-3px);
-    filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-  }
-  50% {
-    transform: rotateY(180deg) translateY(0px);
-    filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-  }
-  75% {
-    transform: rotateY(270deg) translateY(-3px);
-    filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
-  }
-  100% { 
-    transform: rotateY(360deg) translateY(0px);
-    filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
-  }
-}
-
-/* Shopify logo visibility in disco mode */
+/* Shopify logo and disco button animations */
 .disco-mode header img[alt="Shopify Logo"],
 .disco-mode header .shopify-logo,
 .disco-mode header svg path {
@@ -600,11 +591,31 @@ textarea.p-input {
   transform-style: preserve-3d;
   perspective: 1000px;
   backface-visibility: visible;
+  display: inline-block;
 }
 
-.disco-mode header img[alt="Shopify Logo"]:hover,
-.disco-mode header .shopify-logo:hover {
-  animation-duration: 1s;
+/* Update ballerina spin to move side to side */
+@keyframes ballerina-spin {
+  0% { 
+    transform: rotateY(0deg) translateX(0px);
+    filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  }
+  25% {
+    transform: rotateY(90deg) translateX(3px);
+    filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+  }
+  50% {
+    transform: rotateY(180deg) translateX(0px);
+    filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  }
+  75% {
+    transform: rotateY(270deg) translateX(-3px);
+    filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+  }
+  100% { 
+    transform: rotateY(360deg) translateX(0px);
+    filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.5));
+  }
 }
 
 /* Text enhancement */
@@ -646,6 +657,13 @@ textarea.p-input {
     0 0 20px rgba(255, 0, 255, 0.5),
     0 0 40px rgba(0, 255, 255, 0.3);
   z-index: 3;
+  color: #000000 !important;
+}
+
+/* Ensure the rank numbers stay black in disco mode */
+.disco-mode .w-6.h-6.flex-shrink-0.rounded-full span,
+.disco-mode .w-6.h-6.flex-shrink-0.rounded-full div {
+  color: #000000 !important;
 }
 
 /* Enhanced sparkle effect */
@@ -912,8 +930,12 @@ body.disco-mode .theme-toggle {
   border: none;
   box-shadow: none;
   transform: none;
-  animation: none;
-  transition: none;
+  animation: float 2s ease-in-out infinite;
+}
+
+.disco-mode button[aria-label="Toggle disco mode"] span {
+  filter: none !important;
+  opacity: 1 !important;
 }
 
 .disco-mode button[aria-label="Toggle disco mode"]:hover {
@@ -921,16 +943,15 @@ body.disco-mode .theme-toggle {
   border: none;
   box-shadow: none;
   transform: none;
-  animation: none;
-  transition: none;
+  animation: float 1s ease-in-out infinite;
 }
 
-/* Add disco button peek animation */
+/* Update disco button peek animation */
 @keyframes peekSpin {
-  0% { transform: rotateY(0deg); }
-  45% { transform: rotateY(180deg); }
-  55% { transform: rotateY(180deg); }
-  100% { transform: rotateY(360deg); }
+  0% { transform: rotateY(0deg) translateX(0px); }
+  45% { transform: rotateY(180deg) translateX(3px); }
+  55% { transform: rotateY(180deg) translateX(3px); }
+  100% { transform: rotateY(360deg) translateX(0px); }
 }
 
 .disco-peek {

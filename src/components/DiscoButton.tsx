@@ -40,12 +40,12 @@ export default function DiscoButton() {
       onClick={toggleDiscoMode}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="p-2 rounded-[var(--p-border-radius-base)]"
+      className="group p-2 rounded-[var(--p-border-radius-base)]"
       aria-label="Toggle disco mode"
     >
-      <div>
-        <span className={!isDiscoMode && isPeeking ? "disco-peek text-xl" : "text-xl"}>
-          {isDiscoMode || isPeeking ? '😎' : '⚪'}
+      <div className="relative">
+        <span className="text-xl">
+          {isDiscoMode ? '😎' : '⚪'}
         </span>
         {isHovered && !isDiscoMode && (
           <div className="absolute hidden group-hover:block z-10 w-32 p-2 mt-2 text-sm 

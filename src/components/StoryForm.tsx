@@ -66,11 +66,11 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   const getGmvTooltip = (business: BusinessType) => {
     switch(business) {
       case 'D2C':
-        return 'D2C GMV values can be found in Opportunity > Revenue Detail > Opp D2C Revenue Verified';
+        return 'Salesforce Opportunity > Revenue Detail > Opp D2C Revenue Verified';
       case 'B2B':
-        return 'B2B GMV values can be found in Opportunity > Revenue Detail > Opp B2B Revenue Verified';
+        return 'Salesforce Opportunity > Revenue Detail > Opp B2B Revenue Verified';
       case 'POS Pro':
-        return 'Retail GMV values can be found in Opportunity > Revenue Detail > Opp Retail Revenue Verified';
+        return 'Salesforce Opportunity > Revenue Detail > Opp Retail Revenue Verified';
       default:
         return '';
     }
@@ -361,9 +361,9 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               </label>
               <div className="relative">
                 <select
-                  id="launchConsultant"
-                  value={story.launchConsultant}
-                  onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
+                id="launchConsultant"
+                value={story.launchConsultant}
+                onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
                   className="p-input w-full py-2 appearance-none bg-white pr-8"
                 >
                   <option value="">Select consultant</option>
@@ -425,7 +425,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 Opportunity Revenue
               </label>
               <div className="relative flex items-center">
-                <input
+              <input
                   id="opportunityRevenue"
                   type="text"
                   value={story.opportunityRevenue}
@@ -436,7 +436,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 <div className="relative ml-2 group">
                   <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">{'ⓘ'}</span>
                   <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
-                    Opportunity Revenue can be found in Opportunity {'>'} Revenue Detail {'>'} Total Revenue
+                    Salesforce Opportunity {'>'} Revenue Detail {'>'} Total Retail
                   </div>
                 </div>
               </div>
@@ -483,14 +483,14 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 {['D2C', 'B2B', 'POS Pro'].map((business) => (
                   <div key={business} className="flex items-center space-x-3">
                     <label className="flex items-center cursor-pointer w-24">
-                      <input
-                        type="checkbox"
+                    <input
+                      type="checkbox"
                         checked={story.lineOfBusiness?.includes(business as BusinessType) || false}
-                        onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
-                        className="p-input"
-                      />
+                      onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
+                      className="p-input"
+                    />
                       <span className="p-text text-sm ml-2">{business}</span>
-                    </label>
+                  </label>
                     
                     {story.lineOfBusiness?.includes(business as BusinessType) && (
                       <div className="flex-1">
