@@ -51,6 +51,6 @@ Remember: The goal is to build empathy and understanding of Launch Consulting's 
     max_tokens: 400,
     presence_penalty: 0.1,
     frequency_penalty: 0.1,
-    response_format: { "type": "text" }  // Forces plaintext response for faster processing
+    response_format: { type: "text" as const }  // Using type assertion for correct typing
   }
 }; 
