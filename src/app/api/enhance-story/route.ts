@@ -1,12 +1,6 @@
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { AI_RULES } from '@/config/ai-rules';
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: process.env.OPENAI_BASE_URL,
-});
+import openai from '@/utils/openai';
 
 export async function POST(request: Request) {
   try {

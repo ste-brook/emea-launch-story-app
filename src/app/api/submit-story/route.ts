@@ -1,26 +1,32 @@
 import { NextResponse } from 'next/server';
 import { 
   getSheetName, 
-  ensureHeadersExist, 
   appendData, 
   formatLineOfBusinessData 
 } from '@/lib/googleSheets';
+import { createLaunchStoryDoc } from '@/lib/googleDocs';
+import { sendSlackNotification } from '@/lib/slack';
 import type { BusinessType } from '@/components/StoryForm';
 
 export async function POST(request: Request) {
   try {
-    console.log('Received story submission request');
     const story = await request.json();
-    console.log('Story data:', JSON.stringify(story, null, 2));
 
     // Validate required fields
-    const requiredFields = ['merchantName', 'launchConsultant', 'salesforceCaseLink', 'launchStatus', 'lineOfBusiness'];
+    const requiredFields = ['merchantName', 'launchConsultant', 'salesforceCaseLink', 'launchStatus', 'lineOfBusiness', 'opportunityRevenue'];
     const missingFields = requiredFields.filter(field => !story[field]);
     
     if (missingFields.length > 0) {
-      console.log('Error: Missing required fields:', missingFields);
       return NextResponse.json(
         { error: `Missing required fields: ${missingFields.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Validate opportunity revenue format
+    if (!/^\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(story.opportunityRevenue)) {
+      return NextResponse.json(
+        { error: 'Invalid opportunity revenue format. Please use numbers with optional thousands separators and up to 2 decimal places (e.g., 1,000,000.00)' },
         { status: 400 }
       );
     }
@@ -28,36 +34,61 @@ export async function POST(request: Request) {
     // Validate GMV for selected lines of business
     const missingGmv = story.lineOfBusiness.filter((business: BusinessType) => !story.gmv[business]);
     if (missingGmv.length > 0) {
-      console.log('Error: Missing GMV for:', missingGmv);
       return NextResponse.json(
         { error: `Missing GMV for: ${missingGmv.join(', ')}` },
         { status: 400 }
       );
     }
 
-    console.log('Google Sheets credentials:', {
-      client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
-      project_id: process.env.GOOGLE_SHEETS_PROJECT_ID,
-      sheet_id: process.env.GOOGLE_SHEETS_ID,
-      private_key_length: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.length || 0
+    // Validate GMV format
+    const gmvFormatError = story.lineOfBusiness.find((business: BusinessType) => {
+      const gmvValue = story.gmv[business];
+      return !/^\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(gmvValue);
     });
 
-    // Get the sheet name
+    if (gmvFormatError) {
+      return NextResponse.json(
+        { error: `Invalid GMV format for ${gmvFormatError}. Please use numbers with optional thousands separators and up to 2 decimal places (e.g., 1,000,000.00)` },
+        { status: 400 }
+      );
+    }
+
+    // Get sheet name once
     const sheetName = await getSheetName();
-    console.log('Using sheet:', sheetName);
-    
-    // Ensure headers exist
-    const headers = await ensureHeadersExist(sheetName);
-    console.log('Headers found:', headers);
     
     // Format the data for Google Sheets
     const values = formatLineOfBusinessData(story);
-    console.log('Formatted data:', values);
     
-    // Append the data to the sheet
-    await appendData(sheetName, values);
+    // Return success immediately after validation
+    const response = NextResponse.json({ 
+      success: true,
+      message: 'Story submitted successfully'
+    });
 
-    return NextResponse.json({ success: true });
+    // Process all operations in the background
+    Promise.all([
+      // Append to Google Sheet
+      appendData(sheetName, values).catch(error => {
+        console.error('Error saving to Google Sheet:', error);
+      }),
+      
+      // Create Google Doc and send Slack notification
+      (async () => {
+        try {
+          if (process.env.GOOGLE_DRIVE_FOLDER_ID) {
+            const docUrl = await createLaunchStoryDoc(story);
+            await sendSlackNotification({
+              ...story,
+              docUrl
+            });
+          }
+        } catch (error) {
+          console.error('Error in background tasks:', error);
+        }
+      })()
+    ]);
+
+    return response;
   } catch (error) {
     console.error('Error submitting story:', error);
     return NextResponse.json(

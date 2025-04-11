@@ -5,30 +5,49 @@ import { Sparkles } from './Sparkles';
 import { Celebration } from './Celebration';
 import SparklyButton from './SparklyButton';
 
+const LAUNCH_CONSULTANTS = [
+  'Allesandro Baglivo',
+  'Alica Diana',
+  'Ania Kowalska',
+  'Astrid Balza',
+  'Frankie Lodge',
+  'Jack Rapley',
+  'Khalid Chao',
+  'Leslie Ludwig',
+  'Lou Dennehy',
+  'Niklas Hermsdorf',
+  'Sam Zeender',
+  'Sandra Conway',
+  'Sascha Engel',
+  'Stephen Brook',
+  'Tadib Muqtada',
+  'Valeria Honta'
+].sort();
+
 export type BusinessType = 'D2C' | 'B2B' | 'POS Pro';
 
 export interface Story {
   merchantName: string;
-  notes: string;
-  enhancedStory: string;
   launchConsultant: string;
-  team: string;
   salesforceCaseLink: string;
-  lineOfBusiness: BusinessType[];
-  gmv: {
-    D2C?: string;
-    B2B?: string;
-    'POS Pro'?: string;
-  };
+  opportunityRevenue: string;
   launchStatus: string;
   launchDate: string;
-  opportunityRevenue: string;
+  lineOfBusiness: BusinessType[];
+  gmv: Partial<Record<BusinessType, string>>;
+  notes: string;
+  enhancedStory: string;
+  team: string;
 }
 
 interface StoryFormProps {
   story: Story;
   setStory: (story: Story) => void;
 }
+
+type GmvType = Partial<Record<BusinessType, string>>;
+type GmvFieldErrorKey = `gmv_${BusinessType}`;
+type FieldErrorsType = Partial<Record<GmvFieldErrorKey | string, string>>;
 
 export function StoryForm({ story, setStory }: StoryFormProps) {
   const [isEnhancing, setIsEnhancing] = useState(false);
@@ -37,11 +56,53 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   const [showSparkles, setShowSparkles] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [additionalPrompt, setAdditionalPrompt] = useState('');
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrorsType>({});
   const [isEnhancedStoryVisible, setIsEnhancedStoryVisible] = useState(false);
   const [isEnhancedStoryEditable, setIsEnhancedStoryEditable] = useState(false);
   const [isEnhancedStoryTransitioning, setIsEnhancedStoryTransitioning] = useState(false);
+
+  const getGmvTooltip = (business: BusinessType) => {
+    switch(business) {
+      case 'D2C':
+        return 'Salesforce Opportunity > Revenue Detail > Opp D2C Revenue Verified';
+      case 'B2B':
+        return 'Salesforce Opportunity > Revenue Detail > Opp B2B Revenue Verified';
+      case 'POS Pro':
+        return 'Salesforce Opportunity > Revenue Detail > Opp Retail Revenue Verified';
+      default:
+        return '';
+    }
+  };
+
+  // Format GMV value to include commas for thousands
+  const formatGmvValue = (value: string): string => {
+    // Allow decimal point input by preserving it at the end
+    if (value.endsWith('.')) {
+      return value;
+    }
+
+    // Clean the value but preserve decimal points
+    const cleanValue = value.replace(/[^0-9,\.]/g, '');
+    
+    // Handle case where user is typing a decimal number
+    if (cleanValue.endsWith('.')) {
+      return cleanValue;
+    }
+
+    // Split into whole and decimal parts
+    const [wholePart, decimalPart] = cleanValue.split('.');
+    
+    // Format the whole part with commas
+    const formattedWhole = wholePart.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    // Return with decimal part if it exists
+    return decimalPart ? `${formattedWhole}.${decimalPart}` : formattedWhole;
+  };
+
+  // Parse GMV value for calculations (removes commas)
+  const parseGmvValue = (value: string): number => {
+    return parseFloat(value.replace(/,/g, '')) || 0;
+  };
 
   const handleLineOfBusinessChange = (business: string, checked: boolean) => {
     const newLineOfBusiness = checked
@@ -50,10 +111,8 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     
     const newGmv = { ...story.gmv };
     if (checked) {
-      // Initialize GMV for newly selected business
       newGmv[business as BusinessType] = '';
     } else {
-      // Remove GMV for unselected business
       delete newGmv[business as BusinessType];
     }
     
@@ -65,13 +124,17 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   };
 
   const handleGmvChange = (business: BusinessType, value: string) => {
-    setStory({
-      ...story,
-      gmv: {
-        ...story.gmv,
-        [business]: value
-      }
-    });
+    const formattedValue = formatGmvValue(value);
+    const newGmv: GmvType = { ...story.gmv };
+    newGmv[business] = formattedValue;
+    setStory({ ...story, gmv: newGmv });
+
+    const errorKey = `gmv_${business}`;
+    const updatedErrors = { ...fieldErrors };
+    if (errorKey in updatedErrors) {
+      delete updatedErrors[errorKey];
+      setFieldErrors(updatedErrors);
+    }
   };
 
   const handleLaunchStatusChange = (status: string) => {
@@ -79,6 +142,17 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       ...story,
       launchStatus: status,
     });
+  };
+
+  const handleOpportunityRevenueChange = (value: string) => {
+    const formattedValue = formatGmvValue(value);
+    setStory({ ...story, opportunityRevenue: formattedValue });
+
+    const updatedErrors = { ...fieldErrors };
+    if ('opportunityRevenue' in updatedErrors) {
+      delete updatedErrors['opportunityRevenue'];
+      setFieldErrors(updatedErrors);
+    }
   };
 
   const validateFields = () => {
@@ -110,8 +184,19 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
     // Validate GMV for each selected business type
     story.lineOfBusiness.forEach((business: BusinessType) => {
-      if (!story.gmv[business]) {
+      const gmvValue = story.gmv[business];
+      if (!gmvValue) {
         errors[`gmv_${business}`] = `GMV for ${business} is required`;
+      } else {
+        // Check if the GMV value contains only numbers, properly formatted commas, and optional decimal places
+        if (!/^\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(gmvValue)) {
+          errors[`gmv_${business}`] = `GMV for ${business} should be a number with optional thousands separators and up to 2 decimal places (e.g., 1,000,000.00)`;
+        }
+        // Check if the value is too large (prevent integer overflow)
+        const numericValue = parseGmvValue(gmvValue);
+        if (numericValue > Number.MAX_SAFE_INTEGER) {
+          errors[`gmv_${business}`] = `GMV value is too large`;
+        }
       }
     });
     
@@ -164,14 +249,13 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       setError(error instanceof Error ? error.message : 'Failed to enhance story. Please try again.');
     } finally {
       setIsEnhancing(false);
-      setIsUpdating(false);
     }
   };
 
   const handleUpdateStory = async () => {
     if (!validateFields()) return;
     
-    setIsUpdating(true);
+    setIsEnhancing(true);
     setShowSparkles(true);
     
     try {
@@ -200,7 +284,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while updating the story');
     } finally {
-      setIsUpdating(false);
+      setIsEnhancing(false);
       setShowSparkles(false);
     }
   };
@@ -215,45 +299,50 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     setError('');
     
     try {
-      const response = await fetch('/api/submit-story', {
+      // Submit in background
+      fetch('/api/submit-story', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(story),
+      }).catch(err => {
+        console.error('Background submission error:', err);
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit story');
-      }
-
-      setShowCelebration(true);
+      // Wait 2 seconds before showing celebration
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Reset the form after a delay
+      // Show celebration
+      setShowCelebration(true);
+
+      // Prepare empty story
+      const emptyStory: Story = {
+        merchantName: '',
+        notes: '',
+        enhancedStory: '',
+        launchConsultant: '',
+        team: '',
+        salesforceCaseLink: '',
+        lineOfBusiness: [],
+        gmv: {},
+        launchStatus: '',
+        launchDate: '',
+        opportunityRevenue: '',
+      };
+
+      // Wait full 5 seconds before resetting
       setTimeout(() => {
-        const emptyStory: Story = {
-          merchantName: '',
-          notes: '',
-          enhancedStory: '',
-          launchConsultant: '',
-          team: '',
-          salesforceCaseLink: '',
-          lineOfBusiness: [],
-          gmv: {},
-          launchStatus: '',
-          launchDate: '',
-          opportunityRevenue: '',
-        };
-        
+        setShowCelebration(false);
         setStory(emptyStory);
         setAdditionalPrompt('');
-        setShowCelebration(false);
         window.dispatchEvent(new Event('storySubmitted'));
-      }, 4000);
+      }, 5000);
       
     } catch (err) {
       console.error('Error submitting story:', err);
       setError('Failed to submit story. Please try again.');
+      setShowCelebration(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -270,14 +359,26 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               <label htmlFor="launchConsultant" className="block p-text font-medium mb-2 text-sm">
                 Launch Consultant
               </label>
-              <input
-                type="text"
+              <div className="relative">
+                <select
                 id="launchConsultant"
                 value={story.launchConsultant}
                 onChange={(e) => setStory({ ...story, launchConsultant: e.target.value })}
-                className="p-input w-full py-2"
-                placeholder="Enter your name"
-              />
+                  className="p-input w-full py-2 appearance-none bg-white pr-8"
+                >
+                  <option value="">Select consultant</option>
+                  {LAUNCH_CONSULTANTS.map((consultant) => (
+                    <option key={consultant} value={consultant}>
+                      {consultant}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                  </svg>
+                </div>
+              </div>
               {fieldErrors.launchConsultant && (
                 <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.launchConsultant}</p>
               )}
@@ -323,14 +424,22 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
               <label htmlFor="opportunityRevenue" className="block p-text font-medium mb-2 text-sm">
                 Opportunity Revenue
               </label>
+              <div className="relative flex items-center">
               <input
-                type="text"
-                id="opportunityRevenue"
-                value={story.opportunityRevenue}
-                onChange={(e) => setStory({ ...story, opportunityRevenue: e.target.value })}
-                className="p-input w-full py-2"
-                placeholder="Enter opportunity revenue"
-              />
+                  id="opportunityRevenue"
+                  type="text"
+                  value={story.opportunityRevenue}
+                  onChange={(e) => handleOpportunityRevenueChange(e.target.value)}
+                  className="p-input w-full py-2"
+                  placeholder="e.g., 1,000,000"
+                />
+                <div className="relative ml-2 group">
+                  <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">{'ⓘ'}</span>
+                  <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
+                    Salesforce Opportunity {'>'} Revenue Detail {'>'} Total Retail
+                  </div>
+                </div>
+              </div>
               {fieldErrors.opportunityRevenue && (
                 <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors.opportunityRevenue}</p>
               )}
@@ -374,27 +483,37 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                 {['D2C', 'B2B', 'POS Pro'].map((business) => (
                   <div key={business} className="flex items-center space-x-3">
                     <label className="flex items-center cursor-pointer w-24">
-                      <input
-                        type="checkbox"
+                    <input
+                      type="checkbox"
                         checked={story.lineOfBusiness?.includes(business as BusinessType) || false}
-                        onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
-                        className="p-input"
-                      />
+                      onChange={(e) => handleLineOfBusinessChange(business, e.target.checked)}
+                      className="p-input"
+                    />
                       <span className="p-text text-sm ml-2">{business}</span>
-                    </label>
+                  </label>
                     
                     {story.lineOfBusiness?.includes(business as BusinessType) && (
                       <div className="flex-1">
-                        <input
-                          type="text"
-                          id={`gmv_${business.toLowerCase()}`}
-                          value={story.gmv[business as BusinessType] || ''}
-                          onChange={(e) => handleGmvChange(business as BusinessType, e.target.value)}
-                          className="p-input w-full py-1 text-sm"
-                          placeholder={business === 'POS Pro' ? 'Retail GMV' : `${business} GMV`}
-                        />
+                        <div className="relative flex items-center">
+                          <input
+                            type="text"
+                            id={`gmv-${business}`}
+                            value={story.gmv[business as BusinessType] || ''}
+                            onChange={(e) => handleGmvChange(business as BusinessType, e.target.value)}
+                            className={`p-input w-full py-2 ${
+                              fieldErrors[`gmv_${business}`] ? 'border-red-500' : ''
+                            }`}
+                            placeholder={`${business} GMV`}
+                          />
+                          <div className="relative ml-2 group">
+                            <span className="text-lg text-gray-400 hover:text-gray-500 cursor-help">{'ⓘ'}</span>
+                            <div className="absolute hidden group-hover:block z-10 w-64 p-2 mt-2 text-sm text-gray-600 bg-white border rounded shadow-lg -left-24 top-6">
+                              {getGmvTooltip(business as BusinessType)}
+                            </div>
+                          </div>
+                        </div>
                         {fieldErrors[`gmv_${business}`] && (
-                          <p className="p-text p-text-critical mt-1 text-xs">{fieldErrors[`gmv_${business}`]}</p>
+                          <p className="p-text p-text-critical mt-2 text-xs">{fieldErrors[`gmv_${business}`]}</p>
                         )}
                       </div>
                     )}
@@ -470,10 +589,10 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                   <div className="flex justify-between items-center mt-6">
                     <button
                       onClick={handleUpdateStory}
-                      disabled={isEnhancing || isUpdating}
+                      disabled={isEnhancing}
                       className="p-button p-button-primary py-2 px-4 text-sm"
                     >
-                      {isEnhancing || isUpdating ? 'Processing...' : 'Update Story'}
+                      {isEnhancing ? 'Processing...' : 'Update Story'}
                     </button>
                     
                     <button

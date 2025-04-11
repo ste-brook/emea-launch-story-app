@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { StoryForm } from '@/components/StoryForm';
+import { StoryForm, type Story } from '@/components/StoryForm';
 import { LeaderBoard } from '@/components/LeaderBoard';
-import type { Story } from '@/components/StoryForm';
 
 export default function Home() {
   const [story, setStory] = useState<Story>({
@@ -27,6 +26,9 @@ export default function Home() {
       </div>
       <div className="w-full">
         <LeaderBoard currentConsultant={story.launchConsultant} />
+      </div>
+      <div className="text-center text-[var(--p-color-text-subdued)] text-sm mt-2">
+        Feedback? <a href="https://shopify.enterprise.slack.com/team/U03AY7YAKBQ" target="_blank" rel="noopener noreferrer" className="text-[var(--p-color-text-primary)] hover:underline">@Stephen</a>
       </div>
     </div>
   );

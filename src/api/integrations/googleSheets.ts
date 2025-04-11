@@ -158,13 +158,17 @@ export function getLeaderboardData(data: any[]) {
     }
   });
   
+  // First sort by submissions, then assign ranks
   const leaderboard = Array.from(submissionsByConsultant.entries())
-    .map(([name, submissions], index) => ({
+    .map(([name, submissions]) => ({
       name,
-      submissions,
-      rank: index + 1,
+      submissions
     }))
-    .sort((a, b) => b.submissions - a.submissions);
+    .sort((a, b) => b.submissions - a.submissions)
+    .map((entry, index) => ({
+      ...entry,
+      rank: index + 1
+    }));
   
   console.log('Leaderboard data:', leaderboard);
   return leaderboard;

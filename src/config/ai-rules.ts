@@ -46,8 +46,11 @@ Remember: The goal is to build empathy and understanding of Launch Consulting's 
   
   // Model configuration
   modelConfig: {
-    model: "gpt-4-turbo-preview",
-    temperature: 0.4, // Slightly increased for more engaging storytelling while maintaining consistency
-    max_tokens: 1000,
+    model: "gpt-3.5-turbo",
+    temperature: 0.4,
+    max_tokens: 400,
+    presence_penalty: 0.1,
+    frequency_penalty: 0.1,
+    response_format: { type: "text" as const }  // Using type assertion for correct typing
   }
 }; 

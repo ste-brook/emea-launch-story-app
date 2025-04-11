@@ -20,6 +20,25 @@ const validateEnvVars = () => {
   }
 };
 
+// Export the auth client for reuse in other Google APIs
+export async function getGoogleAuthClient() {
+  validateEnvVars();
+  
+  return new google.auth.GoogleAuth({
+    credentials: {
+      client_email: CLIENT_EMAIL,
+      private_key: PRIVATE_KEY,
+      project_id: PROJECT_ID,
+    },
+    scopes: [
+      'https://www.googleapis.com/auth/spreadsheets',
+      'https://www.googleapis.com/auth/drive.file',
+      'https://www.googleapis.com/auth/drive',
+      'https://www.googleapis.com/auth/documents'
+    ],
+  });
+}
+
 // Initialize Google Sheets API
 const initializeSheetsAPI = () => {
   validateEnvVars();
