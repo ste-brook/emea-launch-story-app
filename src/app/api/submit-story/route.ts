@@ -59,43 +59,36 @@ export async function POST(request: Request) {
     // Format the data for Google Sheets
     const values = formatLineOfBusinessData(story);
     
-    try {
-      // Append to Google Sheet (critical operation)
-      await appendData(sheetName, values);
+    // Return success immediately after validation
+    const response = NextResponse.json({ 
+      success: true,
+      message: 'Story submitted successfully'
+    });
 
-      let docUrl = null;
+    // Process all operations in the background
+    Promise.all([
+      // Append to Google Sheet
+      appendData(sheetName, values).catch(error => {
+        console.error('Error saving to Google Sheet:', error);
+      }),
       
-      // Try to create Google Doc if configured (non-critical)
-      if (process.env.GOOGLE_DRIVE_FOLDER_ID) {
+      // Create Google Doc and send Slack notification
+      (async () => {
         try {
-          docUrl = await createLaunchStoryDoc(story);
-          console.log('Google Doc created successfully:', docUrl);
-        } catch (docError) {
-          console.error('Error creating Google Doc:', docError);
-          // Don't fail the submission if doc creation fails
+          if (process.env.GOOGLE_DRIVE_FOLDER_ID) {
+            const docUrl = await createLaunchStoryDoc(story);
+            await sendSlackNotification({
+              ...story,
+              docUrl
+            });
+          }
+        } catch (error) {
+          console.error('Error in background tasks:', error);
         }
-      }
+      })()
+    ]);
 
-      // Send Slack notification in the background (non-blocking)
-      sendSlackNotification({
-        ...story,
-        docUrl
-      }).catch(error => {
-        console.error('Error sending Slack notification:', error);
-      });
-
-      return NextResponse.json({ 
-        success: true,
-        docUrl,
-        message: !docUrl ? 'Story saved successfully. Google Doc creation is temporarily unavailable.' : 'Story saved successfully.'
-      });
-    } catch (operationError) {
-      console.error('Error saving to Google Sheet:', operationError);
-      return NextResponse.json(
-        { error: 'Failed to save story. Please try again.' },
-        { status: 500 }
-      );
-    }
+    return response;
   } catch (error) {
     console.error('Error submitting story:', error);
     return NextResponse.json(

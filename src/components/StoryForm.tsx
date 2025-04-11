@@ -299,45 +299,50 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     setError('');
     
     try {
-      const response = await fetch('/api/submit-story', {
+      // Submit in background
+      fetch('/api/submit-story', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(story),
+      }).catch(err => {
+        console.error('Background submission error:', err);
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit story');
-      }
-
-      setShowCelebration(true);
+      // Wait 2 seconds before showing celebration
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Reset the form after a delay
+      // Show celebration
+      setShowCelebration(true);
+
+      // Prepare empty story
+      const emptyStory: Story = {
+        merchantName: '',
+        notes: '',
+        enhancedStory: '',
+        launchConsultant: '',
+        team: '',
+        salesforceCaseLink: '',
+        lineOfBusiness: [],
+        gmv: {},
+        launchStatus: '',
+        launchDate: '',
+        opportunityRevenue: '',
+      };
+
+      // Wait full 5 seconds before resetting
       setTimeout(() => {
-        const emptyStory: Story = {
-          merchantName: '',
-          notes: '',
-          enhancedStory: '',
-          launchConsultant: '',
-          team: '',
-          salesforceCaseLink: '',
-          lineOfBusiness: [],
-          gmv: {},
-          launchStatus: '',
-          launchDate: '',
-          opportunityRevenue: '',
-        };
-        
+        setShowCelebration(false);
         setStory(emptyStory);
         setAdditionalPrompt('');
-        setShowCelebration(false);
         window.dispatchEvent(new Event('storySubmitted'));
-      }, 4000);
+      }, 5000);
       
     } catch (err) {
       console.error('Error submitting story:', err);
       setError('Failed to submit story. Please try again.');
+      setShowCelebration(false);
     } finally {
       setIsSubmitting(false);
     }
