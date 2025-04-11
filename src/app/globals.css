@@ -961,16 +961,34 @@ body.disco-mode .theme-toggle {
 }
 
 .disco-mode .group:hover div[class*="hidden group-hover:block"] {
-  background: rgba(255, 255, 255, 0.95);
-  color: #000000 !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.95) !important;
+  color: #ffffff !important;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 0 20px rgba(255, 0, 255, 0.3),
+    0 0 40px rgba(0, 255, 255, 0.2);
   backdrop-filter: blur(10px);
+  animation: tooltip-glow 2s ease-in-out infinite;
+  z-index: 1000;
 }
 
-/* Ensure tooltip text stays black in disco mode */
+/* Ensure tooltip text stays visible in disco mode */
 .disco-mode .group:hover div[class*="hidden group-hover:block"] * {
-  color: #000000 !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes tooltip-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(255, 0, 255, 0.3),
+      0 0 40px rgba(0, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 30px rgba(255, 0, 255, 0.4),
+      0 0 60px rgba(0, 255, 255, 0.3);
+  }
 }
 
 /* Ensure error messages are visible in disco mode */
