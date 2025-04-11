@@ -56,12 +56,10 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
   const [showSparkles, setShowSparkles] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [additionalPrompt, setAdditionalPrompt] = useState('');
-  const [isUpdating, setIsUpdating] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrorsType>({});
   const [isEnhancedStoryVisible, setIsEnhancedStoryVisible] = useState(false);
   const [isEnhancedStoryEditable, setIsEnhancedStoryEditable] = useState(false);
   const [isEnhancedStoryTransitioning, setIsEnhancedStoryTransitioning] = useState(false);
-  const [formattedGmv, setFormattedGmv] = useState<Record<BusinessType, string>>({} as Record<BusinessType, string>);
 
   const getGmvTooltip = (business: BusinessType) => {
     switch(business) {
@@ -78,13 +76,23 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
   // Format GMV value to include commas for thousands
   const formatGmvValue = (value: string): string => {
-    // Remove any non-numeric characters except commas and decimal points
+    // Allow decimal point input by preserving it at the end
+    if (value.endsWith('.')) {
+      return value;
+    }
+
+    // Clean the value but preserve decimal points
     const cleanValue = value.replace(/[^0-9,\.]/g, '');
     
-    // Split into whole and decimal parts if there's a decimal point
+    // Handle case where user is typing a decimal number
+    if (cleanValue.endsWith('.')) {
+      return cleanValue;
+    }
+
+    // Split into whole and decimal parts
     const [wholePart, decimalPart] = cleanValue.split('.');
     
-    // Remove all commas and then add them back in the correct positions for the whole part
+    // Format the whole part with commas
     const formattedWhole = wholePart.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     
     // Return with decimal part if it exists
@@ -103,10 +111,8 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     
     const newGmv = { ...story.gmv };
     if (checked) {
-      // Initialize GMV for newly selected business
       newGmv[business as BusinessType] = '';
     } else {
-      // Remove GMV for unselected business
       delete newGmv[business as BusinessType];
     }
     
@@ -123,26 +129,12 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     newGmv[business] = formattedValue;
     setStory({ ...story, gmv: newGmv });
 
-    // Clear any existing error for this field
     const errorKey = `gmv_${business}`;
     const updatedErrors = { ...fieldErrors };
     if (errorKey in updatedErrors) {
       delete updatedErrors[errorKey];
       setFieldErrors(updatedErrors);
     }
-  };
-
-  const validateGmv = (business: BusinessType): boolean => {
-    const gmvValue = story.gmv[business];
-    if (!gmvValue || gmvValue.trim() === '') {
-      const errorKey = `gmv_${business}`;
-      setFieldErrors(prev => ({
-        ...prev,
-        [errorKey]: `Please enter the GMV for ${business}`
-      }));
-      return false;
-    }
-    return true;
   };
 
   const handleLaunchStatusChange = (status: string) => {
@@ -156,7 +148,6 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     const formattedValue = formatGmvValue(value);
     setStory({ ...story, opportunityRevenue: formattedValue });
 
-    // Clear any existing error for this field
     const updatedErrors = { ...fieldErrors };
     if ('opportunityRevenue' in updatedErrors) {
       delete updatedErrors['opportunityRevenue'];
@@ -258,14 +249,13 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       setError(error instanceof Error ? error.message : 'Failed to enhance story. Please try again.');
     } finally {
       setIsEnhancing(false);
-      setIsUpdating(false);
     }
   };
 
   const handleUpdateStory = async () => {
     if (!validateFields()) return;
     
-    setIsUpdating(true);
+    setIsEnhancing(true);
     setShowSparkles(true);
     
     try {
@@ -294,7 +284,7 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred while updating the story');
     } finally {
-      setIsUpdating(false);
+      setIsEnhancing(false);
       setShowSparkles(false);
     }
   };
@@ -594,10 +584,10 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
                   <div className="flex justify-between items-center mt-6">
                     <button
                       onClick={handleUpdateStory}
-                      disabled={isEnhancing || isUpdating}
+                      disabled={isEnhancing}
                       className="p-button p-button-primary py-2 px-4 text-sm"
                     >
-                      {isEnhancing || isUpdating ? 'Processing...' : 'Update Story'}
+                      {isEnhancing ? 'Processing...' : 'Update Story'}
                     </button>
                     
                     <button

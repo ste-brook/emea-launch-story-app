@@ -91,8 +91,6 @@
 
 .p-input[type="date"] {
   @apply px-[var(--p-space-3)];
-  padding-left: 3px;
-  padding-right: 3px;
   position: relative;
 }
 
@@ -106,14 +104,10 @@
 
 .p-input::placeholder {
   @apply text-[var(--p-color-text-subdued)];
-  padding-left: 3px;
-  padding-right: 3px;
 }
 
 textarea.p-input {
   @apply px-[var(--p-space-3)];
-  padding-left: 3px;
-  padding-right: 3px;
 }
 
 /* Polaris-style checkboxes */
@@ -243,15 +237,9 @@ textarea.p-input {
 
 /* Enhanced Disco mode animations */
 @keyframes disco-pulse {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @keyframes float {
@@ -280,7 +268,6 @@ textarea.p-input {
   to { transform: rotate(360deg); }
 }
 
-/* NEOM-inspired Disco Animations */
 @keyframes strobe {
   0%, 20%, 40% { 
     filter: brightness(1.2) contrast(1.1);
@@ -332,48 +319,6 @@ textarea.p-input {
       0 0 102px #95BF47,
       0 0 151px #95BF47;
   }
-}
-
-@keyframes laser-line {
-  0% {
-    transform: translateX(-100%) rotate(35deg);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateX(100%) rotate(35deg);
-    opacity: 0;
-  }
-}
-
-@keyframes disco-rotate {
-  0% { transform: rotate(0deg) scale(1); }
-  25% { transform: rotate(90deg) scale(1.1); }
-  50% { transform: rotate(180deg) scale(1); }
-  75% { transform: rotate(270deg) scale(1.1); }
-  100% { transform: rotate(360deg) scale(1); }
-}
-
-/* Ultimate Disco Mode - Turn it up to 11! */
-@keyframes disco-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@keyframes rhythm-pulse {
-  0%, 100% { opacity: 0.8; }
-  50% { opacity: 1; }
-}
-
-@keyframes neon-flicker {
-  0%, 100% { opacity: 1; }
-  41% { opacity: 1; }
-  42% { opacity: 0.8; }
-  43% { opacity: 1; }
-  45% { opacity: 0.3; }
-  46% { opacity: 1; }
 }
 
 @keyframes spotlight-rotate {
@@ -552,13 +497,6 @@ textarea.p-input {
   position: relative;
   animation: float 2s ease-in-out infinite;
   transform-origin: center;
-}
-
-/* Update float animation to move side to side */
-@keyframes float {
-  0% { transform: translateX(0px); }
-  50% { transform: translateX(5px); }
-  100% { transform: translateX(0px); }
 }
 
 /* Rainbow border effect */
