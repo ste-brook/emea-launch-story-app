@@ -972,3 +972,18 @@ body.disco-mode .theme-toggle {
 .disco-mode .group:hover div[class*="hidden group-hover:block"] * {
   color: #000000 !important;
 }
+
+/* Ensure error messages are visible in disco mode */
+.disco-mode .p-text-critical {
+  color: #ff4d4d !important;
+  text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
+  font-weight: 600;
+}
+
+.disco-mode .p-badge-critical {
+  background-color: #ff4d4d !important;
+  color: white !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(255, 77, 77, 0.5);
+  font-weight: 600;
+}

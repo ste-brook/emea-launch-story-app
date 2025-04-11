@@ -78,17 +78,22 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
 
   // Format GMV value to include commas for thousands
   const formatGmvValue = (value: string): string => {
-    // Remove any non-numeric characters except commas
-    const cleanValue = value.replace(/[^0-9,]/g, '');
-    // Remove all commas and then add them back in the correct positions
-    const number = cleanValue.replace(/,/g, '');
-    if (!number) return '';
-    return number.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    // Remove any non-numeric characters except commas and decimal points
+    const cleanValue = value.replace(/[^0-9,\.]/g, '');
+    
+    // Split into whole and decimal parts if there's a decimal point
+    const [wholePart, decimalPart] = cleanValue.split('.');
+    
+    // Remove all commas and then add them back in the correct positions for the whole part
+    const formattedWhole = wholePart.replace(/,/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    // Return with decimal part if it exists
+    return decimalPart ? `${formattedWhole}.${decimalPart}` : formattedWhole;
   };
 
   // Parse GMV value for calculations (removes commas)
   const parseGmvValue = (value: string): number => {
-    return parseInt(value.replace(/,/g, ''), 10) || 0;
+    return parseFloat(value.replace(/,/g, '')) || 0;
   };
 
   const handleLineOfBusinessChange = (business: string, checked: boolean) => {
@@ -192,9 +197,9 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
       if (!gmvValue) {
         errors[`gmv_${business}`] = `GMV for ${business} is required`;
       } else {
-        // Check if the GMV value contains only numbers and properly formatted commas
-        if (!/^\d{1,3}(,\d{3})*$/.test(gmvValue)) {
-          errors[`gmv_${business}`] = `GMV for ${business} should be a number with optional thousands separators (e.g., 1,000,000)`;
+        // Check if the GMV value contains only numbers, properly formatted commas, and optional decimal places
+        if (!/^\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(gmvValue)) {
+          errors[`gmv_${business}`] = `GMV for ${business} should be a number with optional thousands separators and up to 2 decimal places (e.g., 1,000,000.00)`;
         }
         // Check if the value is too large (prevent integer overflow)
         const numericValue = parseGmvValue(gmvValue);

@@ -24,9 +24,9 @@ export async function POST(request: Request) {
     }
 
     // Validate opportunity revenue format
-    if (!/^\d+(?:,\d{3})*$/.test(story.opportunityRevenue)) {
+    if (!/^\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(story.opportunityRevenue)) {
       return NextResponse.json(
-        { error: 'Invalid opportunity revenue format. Please use numbers with optional thousands separators (e.g., 1,000,000)' },
+        { error: 'Invalid opportunity revenue format. Please use numbers with optional thousands separators and up to 2 decimal places (e.g., 1,000,000.00)' },
         { status: 400 }
       );
     }
@@ -43,12 +43,12 @@ export async function POST(request: Request) {
     // Validate GMV format
     const gmvFormatError = story.lineOfBusiness.find((business: BusinessType) => {
       const gmvValue = story.gmv[business];
-      return !/^\d+(?:,\d{3})*$/.test(gmvValue);
+      return !/^\d{1,3}(,\d{3})*(\.\d{1,2})?$/.test(gmvValue);
     });
 
     if (gmvFormatError) {
       return NextResponse.json(
-        { error: `Invalid GMV format for ${gmvFormatError}. Please use numbers with optional thousands separators (e.g., 1,000,000)` },
+        { error: `Invalid GMV format for ${gmvFormatError}. Please use numbers with optional thousands separators and up to 2 decimal places (e.g., 1,000,000.00)` },
         { status: 400 }
       );
     }
