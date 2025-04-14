@@ -16,6 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link
+          rel="icon"
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"
+        />
+      </head>
       <body className={`${inter.className} bg-[var(--p-color-bg-surface-secondary)] min-h-screen`}>
         <header className="sticky top-0 z-50 bg-[var(--p-color-bg-surface)] border-b border-[var(--p-color-border-subdued)] shadow-[var(--p-shadow-card)]">
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
