@@ -225,7 +225,8 @@ export function StoryForm({ story, setStory }: StoryFormProps) {
         body: JSON.stringify({
           merchantName: story.merchantName,
           notes: story.notes,
-          additionalPrompt: additionalPrompt 
+          additionalPrompt: additionalPrompt,
+          launchConsultant: story.launchConsultant
         }),
       });
 

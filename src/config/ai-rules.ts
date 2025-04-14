@@ -26,23 +26,23 @@ ORIGINAL NOTES: ${notes}
 Your response must follow this EXACT structure:
 
 TL;DR:
-[One clear, impactful sentence summarizing the key value provided]
+[One clear, impactful sentence summarizing the key value provided. Use "Launch Consulting enabled..." here.]
 
 MORE CONTEXT:
-[2-4 sentences providing essential details about the challenge, solution, and implementation]
+[2-4 sentences providing essential details about the challenge, solution, and implementation. IMPORTANT: Use the Launch Consultant's first name here instead of "Launch Consultant" or "Launch Consulting". For example: "Stephen provided guidance..." or "Sarah worked with the merchant..."]
 
 POINT OF THE STORY:
-[1-2 sentences highlighting the unique value that Launch Consulting provided, distinguishing it from regular support]
+[1-2 sentences highlighting the unique value provided. IMPORTANT: Always start with the Launch Consultant's first name, for example: "Stephen enabled..." or "Sarah helped...". Never use "Launch Consulting" or "the team" in this section.]
 
 STRICT RULES:
 1. Use EXACTLY the headings shown above
 2. Focus on strategic value, not just technical implementation
-3. Highlight consultative aspects that differentiate from support
-4. Use clear, professional language accessible to all stakeholders
+3. TL;DR can use "Launch Consulting enabled..."
+4. MORE CONTEXT and POINT OF THE STORY must use the consultant's first name
 5. Never make up or embellish facts - use ONLY the provided information
 6. If information for any section is missing, write "Insufficient information provided"
 
-Remember: The goal is to build empathy and understanding of Launch Consulting's strategic value.`,
+Remember: The goal is to build empathy by making it personal - use the consultant's name to show the individual impact while maintaining the team brand in the summary.`,
   
   // Model configuration
   modelConfig: {

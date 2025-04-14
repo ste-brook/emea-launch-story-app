@@ -4,7 +4,7 @@ import openai from '@/utils/openai';
 
 export async function POST(request: Request) {
   try {
-    const { merchantName, notes, additionalPrompt } = await request.json();
+    const { merchantName, notes, additionalPrompt, launchConsultant } = await request.json();
 
     if (!merchantName || !notes) {
       return NextResponse.json(
@@ -15,6 +15,7 @@ export async function POST(request: Request) {
 
     console.log('Sending request to OpenAI to enhance story...');
     console.log('Original notes:', notes);
+    console.log('Launch Consultant:', launchConsultant || 'Not provided');
     if (additionalPrompt) {
       console.log('Additional instructions:', additionalPrompt);
     }
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
         },
         {
           role: "user" as const,
-          content: AI_RULES.promptTemplate(merchantName, notes)
+          content: `Launch Consultant: ${launchConsultant || 'Not provided'}\n${AI_RULES.promptTemplate(merchantName, notes)}`
         },
         ...(additionalPrompt ? [{
           role: "user" as const,
